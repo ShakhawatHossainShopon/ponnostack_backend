@@ -1,0 +1,20 @@
+# Legacy Reference & Old Code Archives (Never push to remote repository)
+_legacy_reference/
+_reference_old_code/
+
+# Separate Repositories (Independent Git Repos)
+ponnostack-frontend/
+
+# Environment and local overrides
+.env
+*.local.php
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and cache
+*.log
+tmp/
+cache/
