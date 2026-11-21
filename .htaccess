@@ -23,9 +23,9 @@ AddDefaultCharset UTF-8
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
-    # 4. Clean extensionless URLs (e.g. /about -> about.php)
+    # 4. Clean extensionless URLs (e.g. /about -> about.php, /api/packages -> api/packages.php)
     RewriteCond %{REQUEST_FILENAME}.php -f
-    RewriteRule ^([a-zA-Z0-9_-]+)/?$ $1.php [L,QSA]
+    RewriteRule ^(.*)/?$ $1.php [L,QSA]
 
     # 5. Fallback root / and any non-file request directly to index.php
     RewriteCond %{REQUEST_FILENAME} !-f

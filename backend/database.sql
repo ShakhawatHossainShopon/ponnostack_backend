@@ -41,4 +41,37 @@ VALUES (
     'active'
 ) ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
+-- --------------------------------------------------------
+-- Table structure for table `packages`
+-- Strictly 3 fixed packages. Only price (Taka) is editable.
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `packages` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `slug` VARCHAR(50) NOT NULL UNIQUE,
+    `name_bn` VARCHAR(100) NOT NULL,
+    `name_en` VARCHAR(100) NOT NULL,
+    `badge_bn` VARCHAR(100) NULL,
+    `badge_en` VARCHAR(100) NULL,
+    `price` INT UNSIGNED NOT NULL DEFAULT 200,
+    `product_limit` INT NOT NULL DEFAULT 50,
+    `billing_period_bn` VARCHAR(30) NOT NULL DEFAULT '/ মাস',
+    `billing_period_en` VARCHAR(30) NOT NULL DEFAULT '/ month',
+    `is_popular` TINYINT(1) NOT NULL DEFAULT 0,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX `idx_package_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+-- Initial Seed for table `packages`
+-- --------------------------------------------------------
+
+INSERT INTO `packages` (`id`, `slug`, `name_bn`, `name_en`, `badge_bn`, `badge_en`, `price`, `product_limit`, `billing_period_bn`, `billing_period_en`, `is_popular`) 
+VALUES 
+(1, 'starter', 'স্ট্যান্ডার্ড প্যাকেজ', 'Standard Plan', 'সবচেয়ে জনপ্রিয়', 'Most Popular', 200, 50, '/ মাস', '/ month', 1),
+(2, 'professional', 'প্রিমিয়াম প্যাকেজ', 'Premium Plan', 'গ্রোথ ফোকাস্ড', 'Growth Focused', 400, 100, '/ মাস', '/ month', 0),
+(3, 'enterprise', 'এন্টারপ্রাইজ প্যাকেজ', 'Enterprise Plan', 'আনলিমিটেড স্কেল', 'Unlimited Scale', 800, 0, '/ মাস', '/ month', 0)
+ON DUPLICATE KEY UPDATE `id` = VALUES(`id`);
+
 SET FOREIGN_KEY_CHECKS = 1;

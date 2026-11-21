@@ -68,6 +68,84 @@ $heroI18n = [
 
 $h = $heroI18n[$lang] ?? $heroI18n['bn'];
 
+// ---------------------------------------------------------------------------
+// Dynamic Package Pricing & Product Limit Loader (Reads live rates from DB with graceful fallback)
+// ---------------------------------------------------------------------------
+$pkgData = [
+    'starter' => [
+        'price'         => 200,
+        'product_limit' => 50,
+    ],
+    'professional' => [
+        'price'         => 400,
+        'product_limit' => 100,
+    ],
+    'enterprise' => [
+        'price'         => 800,
+        'product_limit' => 0,
+    ],
+];
+
+try {
+    $envFile = __DIR__ . '/.env';
+    if (file_exists($envFile)) {
+        if (!class_exists(\App\Core\Env::class)) {
+            require_once __DIR__ . '/app/Core/Env.php';
+        }
+        if (!class_exists(\App\Core\Database::class)) {
+            require_once __DIR__ . '/app/Core/Database.php';
+        }
+        \App\Core\Env::load($envFile);
+        $dbConn = \App\Core\Database::getConnection();
+        $dbStmt = $dbConn->query("SELECT `slug`, `price`, `product_limit` FROM `packages`");
+        $fetchedRows = $dbStmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($fetchedRows as $row) {
+            $slug = (string)($row['slug'] ?? '');
+            if (isset($pkgData[$slug])) {
+                $pkgData[$slug]['price'] = (int)$row['price'];
+                $pkgData[$slug]['product_limit'] = (int)$row['product_limit'];
+            }
+        }
+    }
+} catch (\Throwable $e) {
+    // Graceful fallback to default values
+}
+
+if (!function_exists('toBnDigits')) {
+    function toBnDigits(int|string $num): string {
+        $en = ['0','1','2','3','4','5','6','7','8','9'];
+        $bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+        return str_replace($en, $bn, (string)$num);
+    }
+}
+
+if (!function_exists('formatProductLimitText')) {
+    function formatProductLimitText(int $limit, string $l = 'bn'): string {
+        if ($limit === 0) {
+            return ($l === 'bn') ? 'আনলিমিটেড প্রোডাক্ট আপলোড' : 'Unlimited Products Upload';
+        }
+        return ($l === 'bn') 
+            ? (toBnDigits($limit) . 'টি প্রোডাক্ট আপলোড') 
+            : ($limit . ' Products Upload');
+    }
+}
+
+$dynPriceStdBn = '৳' . toBnDigits($pkgData['starter']['price']);
+$dynPricePrmBn = '৳' . toBnDigits($pkgData['professional']['price']);
+$dynPriceGldBn = '৳' . toBnDigits($pkgData['enterprise']['price']);
+
+$dynPriceStdEn = '৳' . $pkgData['starter']['price'];
+$dynPricePrmEn = '৳' . $pkgData['professional']['price'];
+$dynPriceGldEn = '৳' . $pkgData['enterprise']['price'];
+
+$dynLimitStdBn = formatProductLimitText($pkgData['starter']['product_limit'], 'bn');
+$dynLimitPrmBn = formatProductLimitText($pkgData['professional']['product_limit'], 'bn');
+$dynLimitGldBn = formatProductLimitText($pkgData['enterprise']['product_limit'], 'bn');
+
+$dynLimitStdEn = formatProductLimitText($pkgData['starter']['product_limit'], 'en');
+$dynLimitPrmEn = formatProductLimitText($pkgData['professional']['product_limit'], 'en');
+$dynLimitGldEn = formatProductLimitText($pkgData['enterprise']['product_limit'], 'en');
+
 // Bilingual Dictionary - Pricing Section (Standard, Premium, Gold)
 $pricingI18n = [
     'bn' => [
@@ -88,11 +166,11 @@ $pricingI18n = [
         'trust_2'      => 'ফ্রি SSL ও ইনস্ট্যান্ট স্টোর অ্যাক্টিভেশন',
         'trust_3'      => 'যেকোনো সময় সহজে প্ল্যান আপগ্রেড',
 
-        // Standard Plan (200 BDT) - HIGHLIGHTED / MOST POPULAR
+        // Standard Plan (Highlighted / Most Popular)
         'plan_std_title'  => 'স্ট্যান্ডার্ড',
         'plan_std_desc'   => 'নতুন উদ্যোক্তা ও ছোট অনলাইন ব্যবসার জন্য সবচেয়ে জনপ্রিয় ও সাশ্রয়ী সমাধান।',
-        'plan_std_price'  => '৳২০০',
-        'plan_std_f1'     => '৫০টি প্রোডাক্ট আপলোড',
+        'plan_std_price'  => $dynPriceStdBn,
+        'plan_std_f1'     => $dynLimitStdBn,
         'plan_std_f2'     => '১৫টি ক্যাটাগরি তৈরি',
         'plan_std_f3'     => 'কাস্টম ডোমেইন ও সাবডোমেইন যুক্ত করার সুবিধা',
         'plan_std_f4'     => 'সরাসরি অনলাইন কাস্টমার অর্ডার ও চেকআউট',
@@ -100,11 +178,11 @@ $pricingI18n = [
         'plan_std_f6'     => 'মোবাইল ও পিসি ১০০% রেসপন্সিভ স্টোরফ্রন্ট',
         'plan_std_f7'     => 'সহজ স্টোর ম্যানেজমেন্ট ড্যাশবোর্ড ও সাপোর্ট',
 
-        // Premium Plan (400 BDT)
+        // Premium Plan
         'plan_prm_title'  => 'প্রিমিয়াম',
         'plan_prm_desc'   => 'মাঝারি ক্যাটালগ ও নিয়মিত অর্ডার পাওয়ার অনলাইন শপের জন্য উপযুক্ত।',
-        'plan_prm_price'  => '৳৪০০',
-        'plan_prm_f1'     => '১০০টি প্রোডাক্ট আপলোড',
+        'plan_prm_price'  => $dynPricePrmBn,
+        'plan_prm_f1'     => $dynLimitPrmBn,
         'plan_prm_f2'     => '৩০টি ক্যাটাগরি তৈরি',
         'plan_prm_f3'     => 'কাস্টম ডোমেইন ও সাবডোমেইন যুক্ত করার সুবিধা',
         'plan_prm_f4'     => 'সরাসরি অনলাইন কাস্টমার অর্ডার ও চেকআউট',
@@ -112,11 +190,11 @@ $pricingI18n = [
         'plan_prm_f6'     => 'কুপন ও ডিসকাউন্ট ভাউচার কোড ইঞ্জিন',
         'plan_prm_f7'     => 'দ্রুত টেকনিক্যাল সাপোর্ট অ্যাসিস্ট্যান্স',
 
-        // Gold Plan (800 BDT)
+        // Gold Plan
         'plan_gld_title'  => 'গোল্ড',
         'plan_gld_desc'   => 'বড় ক্যাটালগ ও আনলিমিটেড প্রোডাক্ট যুক্ত করার জন্য আলটিমেট প্যাকেজ।',
-        'plan_gld_price'  => '৳৮০০',
-        'plan_gld_f1'     => 'আনলিমিটেড প্রোডাক্ট আপলোড',
+        'plan_gld_price'  => $dynPriceGldBn,
+        'plan_gld_f1'     => $dynLimitGldBn,
         'plan_gld_f2'     => 'আনলিমিটেড ক্যাটাগরি ম্যানেজমেন্ট',
         'plan_gld_f3'     => 'কাস্টম ডোমেইন ও সাবডোমেইন যুক্ত করার সুবিধা',
         'plan_gld_f4'     => 'সরাসরি অনলাইন কাস্টমার অর্ডার ও চেকআউট',
@@ -145,8 +223,8 @@ $pricingI18n = [
         // Standard Plan - HIGHLIGHTED / MOST POPULAR
         'plan_std_title'  => 'Standard',
         'plan_std_desc'   => 'The most popular and affordable choice for new boutiques and growing stores.',
-        'plan_std_price'  => '৳200',
-        'plan_std_f1'     => '50 Products Upload',
+        'plan_std_price'  => $dynPriceStdEn,
+        'plan_std_f1'     => $dynLimitStdEn,
         'plan_std_f2'     => '15 Categories Creation',
         'plan_std_f3'     => 'Custom Domain & Subdomain Support',
         'plan_std_f4'     => 'Direct Online Customer Orders & Checkout',
@@ -157,8 +235,8 @@ $pricingI18n = [
         // Premium Plan
         'plan_prm_title'  => 'Premium',
         'plan_prm_desc'   => 'Perfect for stores with regular sales and medium inventory catalogs.',
-        'plan_prm_price'  => '৳400',
-        'plan_prm_f1'     => '100 Products Upload',
+        'plan_prm_price'  => $dynPricePrmEn,
+        'plan_prm_f1'     => $dynLimitPrmEn,
         'plan_prm_f2'     => '30 Categories Creation',
         'plan_prm_f3'     => 'Custom Domain & Subdomain Support',
         'plan_prm_f4'     => 'Direct Online Customer Orders & Checkout',
@@ -169,8 +247,8 @@ $pricingI18n = [
         // Gold Plan
         'plan_gld_title'  => 'Gold',
         'plan_gld_desc'   => 'Ultimate solution for large inventories with unlimited product scalability.',
-        'plan_gld_price'  => '৳800',
-        'plan_gld_f1'     => 'Unlimited Products Upload',
+        'plan_gld_price'  => $dynPriceGldEn,
+        'plan_gld_f1'     => $dynLimitGldEn,
         'plan_gld_f2'     => 'Unlimited Categories Management',
         'plan_gld_f3'     => 'Custom Domain & Subdomain Support',
         'plan_gld_f4'     => 'Direct Online Customer Orders & Checkout',
@@ -804,7 +882,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
 
                         <!-- Price Tag -->
                         <div class="mt-5 mb-6 pb-5 sm:mt-6 sm:mb-7 sm:pb-6 border-b border-emerald-100/80 flex items-baseline">
-                            <span class="text-4xl sm:text-[42px] font-black text-slate-900 tracking-tight font-sans"><?= htmlspecialchars($p['plan_std_price']) ?></span>
+                            <span id="price-val-starter" class="text-4xl sm:text-[42px] font-black text-slate-900 tracking-tight font-sans"><?= htmlspecialchars($p['plan_std_price']) ?></span>
                             <span class="text-xs text-slate-400 font-bold ml-1.5"><?= htmlspecialchars($p['per_month']) ?></span>
                         </div>
 
@@ -814,7 +892,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                                 <span class="w-5 h-5 rounded-full bg-emerald-100 text-[#00684A] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                                     <i data-lucide="check" class="w-3.5 h-3.5 stroke-[2.5]"></i>
                                 </span>
-                                <span class="text-xs text-slate-900 font-black"><?= htmlspecialchars($p['plan_std_f1']) ?></span>
+                                <span id="prod-limit-starter" class="text-xs text-slate-900 font-black"><?= htmlspecialchars($p['plan_std_f1']) ?></span>
                             </div>
                             <div class="flex items-start space-x-3">
                                 <span class="w-5 h-5 rounded-full bg-emerald-100 text-[#00684A] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
@@ -885,7 +963,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
 
                         <!-- Price Tag -->
                         <div class="mt-5 mb-6 pb-5 sm:mt-6 sm:mb-7 sm:pb-6 border-b border-slate-100 flex items-baseline">
-                            <span class="text-4xl font-black text-slate-900 tracking-tight font-sans"><?= htmlspecialchars($p['plan_prm_price']) ?></span>
+                            <span id="price-val-professional" class="text-4xl font-black text-slate-900 tracking-tight font-sans"><?= htmlspecialchars($p['plan_prm_price']) ?></span>
                             <span class="text-xs text-slate-400 font-bold ml-1.5"><?= htmlspecialchars($p['per_month']) ?></span>
                         </div>
 
@@ -895,7 +973,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                                 <span class="w-5 h-5 rounded-full bg-emerald-50 text-[#00684A] flex items-center justify-center shrink-0 mt-0.5">
                                     <i data-lucide="check" class="w-3.5 h-3.5 stroke-[2.5]"></i>
                                 </span>
-                                <span class="text-xs text-slate-900 font-bold"><?= htmlspecialchars($p['plan_prm_f1']) ?></span>
+                                <span id="prod-limit-professional" class="text-xs text-slate-900 font-bold"><?= htmlspecialchars($p['plan_prm_f1']) ?></span>
                             </div>
                             <div class="flex items-start space-x-3">
                                 <span class="w-5 h-5 rounded-full bg-emerald-50 text-[#00684A] flex items-center justify-center shrink-0 mt-0.5">
@@ -966,7 +1044,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
 
                         <!-- Price Tag -->
                         <div class="mt-5 mb-6 pb-5 sm:mt-6 sm:mb-7 sm:pb-6 border-b border-slate-100 flex items-baseline">
-                            <span class="text-4xl font-black text-slate-900 tracking-tight font-sans"><?= htmlspecialchars($p['plan_gld_price']) ?></span>
+                            <span id="price-val-enterprise" class="text-4xl font-black text-slate-900 tracking-tight font-sans"><?= htmlspecialchars($p['plan_gld_price']) ?></span>
                             <span class="text-xs text-slate-400 font-bold ml-1.5"><?= htmlspecialchars($p['per_month']) ?></span>
                         </div>
 
@@ -976,7 +1054,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                                 <span class="w-5 h-5 rounded-full bg-emerald-50 text-[#00684A] flex items-center justify-center shrink-0 mt-0.5">
                                     <i data-lucide="check" class="w-3.5 h-3.5 stroke-[2.5]"></i>
                                 </span>
-                                <span class="text-xs text-slate-900 font-black"><?= htmlspecialchars($p['plan_gld_f1']) ?></span>
+                                <span id="prod-limit-enterprise" class="text-xs text-slate-900 font-black"><?= htmlspecialchars($p['plan_gld_f1']) ?></span>
                             </div>
                             <div class="flex items-start space-x-3">
                                 <span class="w-5 h-5 rounded-full bg-emerald-50 text-[#00684A] flex items-center justify-center shrink-0 mt-0.5">
@@ -1599,6 +1677,35 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
             }, { threshold: 0.08 });
             featObserver.observe(featuresSection);
         }
+
+        // 5. Dynamic Packages Live Sync (Real-time synchronization with Global API)
+        (function syncPackagesLive() {
+            const isBn = (document.documentElement.lang !== 'en');
+            fetch('api/packages')
+                .then(res => res.json())
+                .then(res => {
+                    if (res && res.success && Array.isArray(res.data)) {
+                        res.data.forEach(pkg => {
+                            const slug = pkg.slug;
+                            const priceEl = document.getElementById('price-val-' + slug);
+                            const limitEl = document.getElementById('prod-limit-' + slug);
+
+                            if (priceEl) {
+                                const priceStr = isBn ? ('৳' + pkg.formatted_price_bn) : ('৳' + pkg.formatted_price_en);
+                                priceEl.textContent = priceStr;
+                            }
+
+                            if (limitEl) {
+                                const limitStr = isBn ? pkg.formatted_product_limit_bn : pkg.formatted_product_limit_en;
+                                limitEl.textContent = limitStr;
+                            }
+                        });
+                    }
+                })
+                .catch(() => {
+                    // Gracefully retain SSR values if offline or network drops
+                });
+        })();
 
         // Initialize Lucide Icons for dynamic elements
         if (window.lucide) {

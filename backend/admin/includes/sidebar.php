@@ -28,6 +28,13 @@ $navItems = [
         'url'   => 'index.php?page=tenants',
     ],
     [
+        'id'    => 'packages',
+        'label' => 'প্যাকেজ ইনফো',
+        'sub'   => 'Package Info & Pricing',
+        'icon'  => 'tag',
+        'url'   => 'index.php?page=packages',
+    ],
+    [
         'id'    => 'settings',
         'label' => 'প্ল্যাটফর্ম সেটিংস',
         'sub'   => 'System Config',

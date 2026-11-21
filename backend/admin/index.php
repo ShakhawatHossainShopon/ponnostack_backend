@@ -27,6 +27,10 @@ $pageRegistry = [
         'title' => 'স্টোর ও টেন্যান্টস | Ponnostack',
         'file'  => 'tenants.php',
     ],
+    'packages' => [
+        'title' => 'প্যাকেজ ইনফো ও প্রাইসিং | Ponnostack',
+        'file'  => 'packages.php',
+    ],
     'settings' => [
         'title' => 'প্ল্যাটফর্ম সেটিংস | Ponnostack',
         'file'  => 'settings.php',
