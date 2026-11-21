@@ -40,12 +40,12 @@ if (!empty($_SESSION['admin_user'])) {
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 antialiased selection:bg-indigo-600 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 antialiased selection:bg-[#00684A] selection:text-white">
 
     <div class="w-full max-w-md">
         <!-- Brand Header -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 mb-3">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#00684A] text-white shadow-lg shadow-[#00684A]/30 mb-3">
                 <i data-lucide="shield-check" class="w-8 h-8"></i>
             </div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">Ponnostack Admin</h1>
@@ -70,7 +70,7 @@ if (!empty($_SESSION['admin_user'])) {
                             <i data-lucide="mail" class="w-4 h-4"></i>
                         </div>
                         <input type="email" id="loginEmail" name="email" required placeholder="name@domain.com"
-                            class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition">
+                            class="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#00684A] focus:border-transparent transition">
                     </div>
                 </div>
 
@@ -82,7 +82,7 @@ if (!empty($_SESSION['admin_user'])) {
                             <i data-lucide="lock" class="w-4 h-4"></i>
                         </div>
                         <input type="password" id="loginPassword" name="password" required placeholder="••••••••"
-                            class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition">
+                            class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#00684A] focus:border-transparent transition">
                         <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
                             <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
                         </button>
@@ -92,7 +92,7 @@ if (!empty($_SESSION['admin_user'])) {
                 <!-- Remember Info -->
                 <div class="flex items-center justify-between text-xs pt-1">
                     <label class="flex items-center space-x-2 cursor-pointer select-none">
-                        <input type="checkbox" id="rememberMe" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5">
+                        <input type="checkbox" id="rememberMe" class="rounded border-slate-300 text-[#00684A] focus:ring-[#00684A] w-3.5 h-3.5">
                         <span class="text-slate-600 font-medium">আমাকে মনে রাখুন</span>
                     </label>
                     <span class="text-slate-400 text-[11px]">নিরাপদ সেশন</span>
@@ -100,7 +100,7 @@ if (!empty($_SESSION['admin_user'])) {
 
                 <!-- Submit Button -->
                 <button type="submit" id="loginSubmitBtn"
-                    class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-bold transition flex items-center justify-center space-x-2 shadow-sm cursor-pointer mt-2">
+                    class="w-full py-3 px-4 rounded-xl bg-[#00684A] hover:bg-[#005139] active:bg-[#023424] text-white text-xs font-bold transition flex items-center justify-center space-x-2 shadow-sm cursor-pointer mt-2">
                     <i data-lucide="log-in" class="w-4 h-4"></i>
                     <span>লগইন করুন</span>
                 </button>

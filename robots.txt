@@ -1,0 +1,19 @@
+# =======================================================================
+# Ponnostack Platform - Search Engine Robots Exclusion Protocol
+# Production URL: https://ponnostack.shop/
+# =======================================================================
+
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /favicon.ico
+
+# Disallow Internal Application Engines and Sensitive Files
+Disallow: /backend/
+Disallow: /app/
+Disallow: /includes/
+Disallow: /.env*
+Disallow: /*.sql$
+
+# Sitemap Reference for Production
+Sitemap: https://ponnostack.shop/sitemap.xml
