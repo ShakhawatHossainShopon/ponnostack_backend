@@ -8,28 +8,26 @@ AddDefaultCharset UTF-8
     RewriteCond %{HTTP_HOST} ^www\.ponnostack\.shop$ [NC]
     RewriteRule ^(.*)$ https://ponnostack.shop/$1 [R=301,L]
 
-    # 2. Redirect direct index.php in browser to clean canonical root /
+    # 2. Redirect direct browser requests to index.php to canonical root
+    # Production:
     RewriteCond %{HTTP_HOST} ^(?:www\.)?ponnostack\.shop$ [NC]
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+index\.php(?:\?([^\s]*))?\s [NC]
     RewriteRule ^index\.php$ / [R=301,L]
 
-    # 3. Localhost direct index.php removal
+    # Localhost:
     RewriteCond %{HTTP_HOST} localhost [NC]
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/Ponnostack/index\.php(?:\?([^\s]*))?\s [NC]
     RewriteRule ^index\.php$ /Ponnostack/ [R=301,L]
 
-    # 4. Pass-through for real existing files and directories
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
+    # 3. Serve real existing files directly (images, css, js, robots.txt, sitemap.xml)
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
-    # 5. Clean extensionless URLs on production (exclude backend/)
-    RewriteCond %{HTTP_HOST} ^(?:www\.)?ponnostack\.shop$ [NC]
-    RewriteCond %{REQUEST_URI} !^/backend/ [NC]
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+([a-zA-Z0-9_-]+)\.php(?:\?([^\s]*))?\s [NC]
-    RewriteRule ^ %1 [R=301,L]
-
-    # 6. Internally rewrite extensionless URL to .php file
+    # 4. Clean extensionless URLs (e.g. /about -> about.php)
     RewriteCond %{REQUEST_FILENAME}.php -f
     RewriteRule ^([a-zA-Z0-9_-]+)/?$ $1.php [L,QSA]
+
+    # 5. Fallback root / and any non-file request directly to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
 </IfModule>
