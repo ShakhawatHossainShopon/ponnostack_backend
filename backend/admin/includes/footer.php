@@ -6,7 +6,7 @@ declare(strict_types=1);
 
     <!-- Universal Confirmation Modal (Pure Light Mode) -->
     <!-- Standard: Clicking outside backdrop does NOT close modal. Only [X] cross or [বাতিল] cancel button closes it. -->
-    <div id="globalConfirmModal" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 transition-all">
+    <div id="globalConfirmModal" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-[100] hidden flex items-center justify-center p-4 transition-all">
         <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm p-6 shadow-2xl text-center transform transition-all animate-fade-in relative">
             <!-- Modal Close Button (Cross) -->
             <button type="button" id="globalCloseXBtn" class="absolute top-3.5 right-3.5 w-7 h-7 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="বন্ধ করুন">
@@ -34,7 +34,7 @@ declare(strict_types=1);
     </div>
 
     <!-- Universal Toast Notification Container (Pure Light Mode) -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[110] space-y-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
     <script>
         // ==========================================

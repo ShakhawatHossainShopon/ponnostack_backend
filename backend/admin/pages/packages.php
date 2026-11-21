@@ -152,8 +152,9 @@ $packages = $packageModel->getAll();
 
 <!-- ======================================================== -->
 <!-- MODAL: UPDATE PACKAGE (Price & Product Limit)            -->
+<!-- Teleported directly to <body> for true viewport coverage -->
 <!-- ======================================================== -->
-<div id="modalEditPackage" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs hidden" role="dialog" aria-modal="true">
+<div id="modalEditPackage" class="fixed inset-0 w-full h-full z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs hidden" role="dialog" aria-modal="true">
     <div class="bg-white rounded-3xl max-w-md w-full border border-slate-200/90 shadow-2xl overflow-hidden animate-scale-in">
         
         <!-- Modal Header -->
@@ -247,8 +248,34 @@ $packages = $packageModel->getAll();
         return String(num).replace(/[0-9]/g, w => bn[en.indexOf(w)]);
     }
 
+    // Teleport modal directly to <body> so it always covers 100vw x 100vh of the browser viewport (covering sidebar & header)
+    function ensureModalInBody() {
+        const modal = document.getElementById('modalEditPackage');
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', ensureModalInBody);
+    } else {
+        ensureModalInBody();
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('modalEditPackage');
+            if (modal && !modal.classList.contains('hidden')) {
+                closeEditPackageModal();
+            }
+        }
+    });
+
     // 2. Open Modal with Pre-filled Values
     function openEditPackageModal(id, name, currentPrice, currentLimit) {
+        ensureModalInBody();
+
         document.getElementById('editPkgId').value = id;
         document.getElementById('inputPkgPrice').value = currentPrice;
         document.getElementById('inputPkgProdLimit').value = currentLimit;

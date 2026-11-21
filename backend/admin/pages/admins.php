@@ -111,7 +111,7 @@ declare(strict_types=1);
 
 <!-- Modal: Add / Edit Admin (Teleported directly to <body> for true viewport coverage) -->
 <!-- Standard: Clicking outside backdrop does NOT close modal. Only [X] cross or [বাতিল] cancel button closes it. -->
-<div id="modalAdmin" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+<div id="modalAdmin" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-[100] hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
         <!-- Modal Header -->
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
