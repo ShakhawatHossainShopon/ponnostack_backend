@@ -1,118 +1,35 @@
-# =======================================================================
-# Ponnostack Platform - Enterprise Web Server Configuration
-# =======================================================================
-
 DirectoryIndex index.php
-
-# CHARACTER ENCODING
 AddDefaultCharset UTF-8
-DefaultLanguage bn
 
-# -----------------------------------------------------------------------
-# REWRITE ENGINE & CLEAN CANONICAL ROUTING
-# -----------------------------------------------------------------------
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # 1. PRODUCTION: Redirect www to non-www
+    # 1. Redirect www.ponnostack.shop to non-www
     RewriteCond %{HTTP_HOST} ^www\.ponnostack\.shop$ [NC]
     RewriteRule ^(.*)$ https://ponnostack.shop/$1 [R=301,L]
 
-    # 2. PRODUCTION: Direct index.php removal -> /
+    # 2. Redirect direct index.php in browser to clean canonical root /
     RewriteCond %{HTTP_HOST} ^(?:www\.)?ponnostack\.shop$ [NC]
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+index\.php(?:\?([^\s]*))?\s [NC]
     RewriteRule ^index\.php$ / [R=301,L]
 
-    # 3. LOCALHOST: Direct index.php removal -> /Ponnostack/
+    # 3. Localhost direct index.php removal
     RewriteCond %{HTTP_HOST} localhost [NC]
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/Ponnostack/index\.php(?:\?([^\s]*))?\s [NC]
     RewriteRule ^index\.php$ /Ponnostack/ [R=301,L]
 
-    # 4. PASS-THROUGH FOR REAL EXISTING FILES AND DIRECTORIES
+    # 4. Pass-through for real existing files and directories
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # 5. PRODUCTION: Clean .php extension removal (exclude backend/)
+    # 5. Clean extensionless URLs on production (exclude backend/)
     RewriteCond %{HTTP_HOST} ^(?:www\.)?ponnostack\.shop$ [NC]
     RewriteCond %{REQUEST_URI} !^/backend/ [NC]
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/([a-zA-Z0-9_-]+)\.php(?:\?([^\s]*))?\s [NC]
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/+([a-zA-Z0-9_-]+)\.php(?:\?([^\s]*))?\s [NC]
     RewriteRule ^ %1 [R=301,L]
 
-    # 6. LOCALHOST: Clean .php extension removal (exclude backend/)
-    RewriteCond %{HTTP_HOST} localhost [NC]
-    RewriteCond %{REQUEST_URI} !^/Ponnostack/backend/ [NC]
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/Ponnostack/([a-zA-Z0-9_-]+)\.php(?:\?([^\s]*))?\s [NC]
-    RewriteRule ^ /Ponnostack/%1 [R=301,L]
-
-    # 7. INTERNALLY REWRITE EXTENSIONLESS CLEAN URLS TO .php FILE
+    # 6. Internally rewrite extensionless URL to .php file
     RewriteCond %{REQUEST_FILENAME}.php -f
     RewriteRule ^([a-zA-Z0-9_-]+)/?$ $1.php [L,QSA]
 </IfModule>
-
-# -----------------------------------------------------------------------
-# GZIP / DEFLATE COMPRESSION (mod_deflate)
-# -----------------------------------------------------------------------
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
-    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
-    AddOutputFilterByType DEFLATE image/svg+xml font/woff2 font/woff
-</IfModule>
-
-# -----------------------------------------------------------------------
-# BROWSER CACHING & EXPIRATION (mod_expires)
-# -----------------------------------------------------------------------
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresDefault "access plus 1 month"
-    
-    # HTML Document (revalidate frequently)
-    ExpiresByType text/html "access plus 1 hour"
-    
-    # Static Assets (1 Year Cache for 100/100 PageSpeed)
-    ExpiresByType text/css "access plus 1 year"
-    ExpiresByType application/javascript "access plus 1 year"
-    ExpiresByType application/x-javascript "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-    ExpiresByType image/x-icon "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType font/woff2 "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-</IfModule>
-
-# -----------------------------------------------------------------------
-# HTTP SECURITY HEADERS (mod_headers)
-# -----------------------------------------------------------------------
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-# -----------------------------------------------------------------------
-# SECURITY: PREVENT ACCESS TO SENSITIVE DOT FILES & SQL EXPORTS
-# Apache 2.4 & 2.2 Universal Compatibility
-# -----------------------------------------------------------------------
-<FilesMatch "^\.env">
-    <IfModule mod_authz_core.c>
-        Require all denied
-    </IfModule>
-    <IfModule !mod_authz_core.c>
-        Order allow,deny
-        Deny from all
-    </IfModule>
-</FilesMatch>
-
-<Files "*.sql">
-    <IfModule mod_authz_core.c>
-        Require all denied
-    </IfModule>
-    <IfModule !mod_authz_core.c>
-        Order allow,deny
-        Deny from all
-    </IfModule>
-</Files>
