@@ -5,8 +5,14 @@ declare(strict_types=1);
     </div> <!-- Close Master Flex Container -->
 
     <!-- Universal Confirmation Modal (Pure Light Mode) -->
+    <!-- Standard: Clicking outside backdrop does NOT close modal. Only [X] cross or [বাতিল] cancel button closes it. -->
     <div id="globalConfirmModal" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 transition-all">
-        <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm p-6 shadow-2xl text-center transform transition-all animate-fade-in" onclick="event.stopPropagation()">
+        <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm p-6 shadow-2xl text-center transform transition-all animate-fade-in relative">
+            <!-- Modal Close Button (Cross) -->
+            <button type="button" id="globalCloseXBtn" class="absolute top-3.5 right-3.5 w-7 h-7 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="বন্ধ করুন">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+
             <!-- Icon Badge -->
             <div id="globalConfirmIcon" class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3 shadow-xs">
                 <i data-lucide="alert-triangle" class="w-6 h-6"></i>
@@ -42,6 +48,7 @@ declare(strict_types=1);
                     const msgEl = document.getElementById('globalConfirmMessage');
                     const confirmBtn = document.getElementById('globalConfirmBtn');
                     const cancelBtn = document.getElementById('globalCancelBtn');
+                    const closeXBtn = document.getElementById('globalCloseXBtn');
                     const iconEl = document.getElementById('globalConfirmIcon');
 
                     titleEl.textContent = options.title || 'আপনি কি নিশ্চিত?';
@@ -68,26 +75,20 @@ declare(strict_types=1);
                     modal.classList.remove('hidden');
                     document.body.style.overflow = 'hidden';
 
-                    const onKey = (e) => {
-                        if (e.key === 'Escape') cleanup(false);
-                    };
-
                     const cleanup = (result) => {
                         modal.classList.add('hidden');
                         document.body.style.overflow = '';
-                        document.removeEventListener('keydown', onKey);
                         confirmBtn.onclick = null;
                         cancelBtn.onclick = null;
-                        modal.onclick = null;
+                        if (closeXBtn) closeXBtn.onclick = null;
                         resolve(result);
                     };
 
                     confirmBtn.onclick = () => cleanup(true);
                     cancelBtn.onclick = () => cleanup(false);
-                    modal.onclick = (e) => {
-                        if (e.target === modal) cleanup(false);
-                    };
-                    document.addEventListener('keydown', onKey);
+                    if (closeXBtn) closeXBtn.onclick = () => cleanup(false);
+                    // Standard Rule: Clicking outside backdrop does NOT close modal.
+                    // Only [X] cross button, [বাতিল] cancel button, or action button closes it.
                 });
             }
         };

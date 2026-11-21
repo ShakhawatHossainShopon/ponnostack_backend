@@ -110,12 +110,13 @@ declare(strict_types=1);
 </div>
 
 <!-- Modal: Add / Edit Admin (Teleported directly to <body> for true viewport coverage) -->
-<div id="modalAdmin" onclick="if(event.target === this) closeAdminModal()" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in" onclick="event.stopPropagation()">
+<!-- Standard: Clicking outside backdrop does NOT close modal. Only [X] cross or [বাতিল] cancel button closes it. -->
+<div id="modalAdmin" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
         <!-- Modal Header -->
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <h3 id="modalTitle" class="text-sm font-black text-slate-900">নতুন অ্যাডমিন যোগ করুন</h3>
-            <button type="button" onclick="closeAdminModal()" class="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition">
+            <button type="button" onclick="closeAdminModal()" class="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
         </div>
@@ -191,11 +192,6 @@ declare(strict_types=1);
         if (modal && modal.parentElement !== document.body) {
             document.body.appendChild(modal);
         }
-
-        // Close on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeAdminModal();
-        });
 
         loadAdmins();
     });
