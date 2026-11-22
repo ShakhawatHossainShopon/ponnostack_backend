@@ -22,7 +22,7 @@ declare(strict_types=1);
     <div class="flex items-center space-x-3">
         <!-- User Pill -->
         <div class="flex items-center space-x-2.5 bg-slate-50 py-1.5 px-3 rounded-2xl border border-slate-200/80">
-            <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs uppercase shadow-xs">
+            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-[#00684A] flex items-center justify-center font-bold text-xs uppercase shadow-xs">
                 <?= strtoupper(substr($currentUser['name'] ?? 'A', 0, 1)) ?>
             </div>
             <div class="text-left hidden sm:block">

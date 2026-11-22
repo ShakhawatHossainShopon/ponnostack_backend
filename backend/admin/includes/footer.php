@@ -5,8 +5,7 @@ declare(strict_types=1);
     </div> <!-- Close Master Flex Container -->
 
     <!-- Universal Confirmation Modal (Pure Light Mode) -->
-    <!-- Standard: Clicking outside backdrop does NOT close modal. Only [X] cross or [বাতিল] cancel button closes it. -->
-    <div id="globalConfirmModal" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-[100] hidden flex items-center justify-center p-4 transition-all">
+    <div id="globalConfirmModal" onclick="if(event.target === this) { const cancelBtn = document.getElementById('globalCancelBtn'); if(cancelBtn) cancelBtn.click(); }" class="fixed inset-0 w-full h-full bg-slate-100/85 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 transition-all">
         <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm p-6 shadow-2xl text-center transform transition-all animate-fade-in relative">
             <!-- Modal Close Button (Cross) -->
             <button type="button" id="globalCloseXBtn" class="absolute top-3.5 right-3.5 w-7 h-7 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer" title="বন্ধ করুন">
@@ -57,8 +56,8 @@ declare(strict_types=1);
                     cancelBtn.textContent = options.cancelText || 'বাতিল';
 
                     if (options.type === 'primary') {
-                        confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center';
-                        iconEl.className = 'w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-3 shadow-xs';
+                        confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-xl bg-[#00684A] hover:bg-[#00523A] text-white text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center';
+                        iconEl.className = 'w-12 h-12 rounded-2xl bg-emerald-100 text-[#00684A] flex items-center justify-center mx-auto mb-3 shadow-xs';
                         iconEl.innerHTML = '<i data-lucide="help-circle" class="w-6 h-6"></i>';
                     } else {
                         confirmBtn.className = 'w-1/2 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center';
@@ -286,6 +285,14 @@ declare(strict_types=1);
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             PageLoader.init();
+
+            // Universal Modal Teleport: Move any modal directly to <body> so it cleanly covers 100vw x 100vh without being trapped in layout
+            document.querySelectorAll('[id$="Modal"], [id^="modal"]').forEach(modal => {
+                if (modal && modal.parentElement !== document.body) {
+                    document.body.appendChild(modal);
+                }
+            });
+
             if (window.lucide) lucide.createIcons();
 
             // Intercept internal navigation clicks for silky smooth transition & auto-close mobile drawer

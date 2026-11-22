@@ -28,7 +28,7 @@ $translations = [
         'features'    => 'ফিচারসমূহ',
         'pricing'     => 'প্রাইসিং',
         'contact'     => 'যোগাযোগ',
-        'cta'         => 'শুরু করুন',
+        'cta'         => 'কাস্টমার পোর্টাল',
     ],
     'en' => [
         'title'       => 'Ponnostack - No-Code E-Commerce Website Builder in Bangladesh',
@@ -38,7 +38,7 @@ $translations = [
         'features'    => 'Features',
         'pricing'     => 'Pricing',
         'contact'     => 'Contact',
-        'cta'         => 'Get Started',
+        'cta'         => 'Customer Portal',
     ],
 ];
 
@@ -444,28 +444,22 @@ $prodUrl = 'https://ponnostack.shop/' . ($lang === 'en' ? '?lang=en' : '');
                         </a>
                     </div>
 
-                    <!-- Primary Header CTA Button (Points to Pricing) -->
-                    <a href="#pricing" 
+                    <!-- Primary Header CTA Button (Points to Merchant Portal) -->
+                    <a href="<?= htmlspecialchars($baseUrl . 'portal/') ?>" id="headerPortalBtnDesktop"
                        class="btn-cta text-xs font-bold text-white px-5 py-2.5 rounded-xl inline-flex items-center justify-center space-x-1.5 cursor-pointer shrink-0 whitespace-nowrap">
-                        <span><?= htmlspecialchars($t['cta']) ?></span>
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 shrink-0"></i>
+                        <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span id="headerPortalTextDesktop"><?= htmlspecialchars($t['cta']) ?></span>
                     </a>
                 </div>
 
-                <!-- Mobile Header Actions & Toggle -->
+                <!-- Mobile Header Actions & Toggle (Clean, No Clutter) -->
                 <div class="flex md:hidden items-center space-x-2 shrink-0">
-                    <!-- Mobile Language Switcher -->
-                    <div class="inline-flex items-center rounded-lg bg-slate-100 p-0.5 border border-slate-200 text-[10px] font-bold shrink-0">
-                        <a href="?lang=bn" class="px-2 py-0.5 rounded transition <?= $lang === 'bn' ? 'bg-white text-[#00684A] shadow-2xs font-black' : 'text-slate-500' ?>">বাং</a>
-                        <a href="?lang=en" class="px-2 py-0.5 rounded transition <?= $lang === 'en' ? 'bg-white text-[#00684A] shadow-2xs font-black' : 'text-slate-500' ?>">EN</a>
-                    </div>
-
                     <!-- Mobile CTA Button in Header Navbar -->
-                    <a href="#pricing" 
+                    <a href="<?= htmlspecialchars($baseUrl . 'portal/') ?>" id="headerPortalBtnMobile"
                        class="btn-cta text-xs font-bold text-white px-3.5 py-1.5 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-95 transition-all shrink-0 whitespace-nowrap"
                        title="<?= htmlspecialchars($t['cta']) ?>">
-                        <span class="inline-block"><?= htmlspecialchars($t['cta']) ?></span>
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5 shrink-0"></i>
+                        <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span id="headerPortalTextMobile" class="inline-block"><?= htmlspecialchars($t['cta']) ?></span>
                     </a>
 
                     <!-- Mobile Hamburger Button -->
@@ -540,9 +534,10 @@ $prodUrl = 'https://ponnostack.shop/' . ($lang === 'en' ? '?lang=en' : '');
 
         <!-- Drawer Footer Actions -->
         <div class="p-5 border-t border-slate-100 bg-slate-50/50">
-            <a href="#pricing" onclick="closeMobileDrawer()" 
-               class="block w-full py-3 text-center btn-cta text-white text-xs font-bold rounded-xl shadow-md">
-                <?= htmlspecialchars($t['cta']) ?>
+            <a href="<?= htmlspecialchars($baseUrl . 'portal/') ?>" onclick="closeMobileDrawer()" 
+               class="block w-full py-3 text-center btn-cta text-white text-xs font-bold rounded-xl shadow-md flex items-center justify-center space-x-2">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                <span><?= htmlspecialchars($t['cta']) ?></span>
             </a>
         </div>
     </aside>

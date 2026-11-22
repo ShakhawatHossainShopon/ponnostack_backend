@@ -154,7 +154,7 @@ $packages = $packageModel->getAll();
 <!-- MODAL: UPDATE PACKAGE (Price & Product Limit)            -->
 <!-- Teleported directly to <body> for true viewport coverage -->
 <!-- ======================================================== -->
-<div id="modalEditPackage" class="fixed inset-0 w-full h-full z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs hidden" role="dialog" aria-modal="true">
+<div id="modalEditPackage" onclick="if(event.target === this) closeModal()" class="fixed inset-0 w-full h-full z-[100] flex items-center justify-center p-4 bg-slate-100/85 backdrop-blur-md hidden" role="dialog" aria-modal="true">
     <div class="bg-white rounded-3xl max-w-md w-full border border-slate-200/90 shadow-2xl overflow-hidden animate-scale-in">
         
         <!-- Modal Header -->

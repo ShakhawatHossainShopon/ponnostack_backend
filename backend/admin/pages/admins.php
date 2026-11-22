@@ -8,8 +8,8 @@ declare(strict_types=1);
     <!-- Header Banner & Action Button -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs">
         <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold uppercase tracking-wider mb-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider mb-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#00684A]"></span>
                 <span>অ্যাডমিন ডিরেক্টরি</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">অ্যাডমিন ম্যানেজমেন্ট (Admin Accounts)</h2>
@@ -17,7 +17,7 @@ declare(strict_types=1);
         </div>
         
         <button type="button" onclick="openAddAdminModal()"
-            class="inline-flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition cursor-pointer self-start sm:self-auto">
+            class="inline-flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl bg-[#00684A] hover:bg-[#00523A] text-white text-xs font-bold shadow-brand-glow transition cursor-pointer self-start sm:self-auto">
             <i data-lucide="user-plus" class="w-4 h-4"></i>
             <span>নতুন অ্যাডমিন যোগ করুন</span>
         </button>
@@ -32,7 +32,7 @@ declare(strict_types=1);
                     <span class="inline-block w-8 h-6 rounded-lg skeleton-shimmer align-middle"></span>
                 </span>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center">
                 <i data-lucide="users" class="w-5 h-5"></i>
             </div>
         </div>
@@ -40,11 +40,11 @@ declare(strict_types=1);
         <div class="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">সুপার অ্যাডমিন</span>
-                <span id="statSuperAdmins" class="text-2xl font-black text-indigo-600 mt-0.5 block">
+                <span id="statSuperAdmins" class="text-2xl font-black text-[#00684A] mt-0.5 block">
                     <span class="inline-block w-8 h-6 rounded-lg skeleton-shimmer align-middle"></span>
                 </span>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-[#00684A] flex items-center justify-center">
                 <i data-lucide="shield" class="w-5 h-5"></i>
             </div>
         </div>
@@ -111,7 +111,7 @@ declare(strict_types=1);
 
 <!-- Modal: Add / Edit Admin (Teleported directly to <body> for true viewport coverage) -->
 <!-- Standard: Clicking outside backdrop does NOT close modal. Only [X] cross or [বাতিল] cancel button closes it. -->
-<div id="modalAdmin" class="fixed inset-0 w-full h-full bg-slate-900/50 backdrop-blur-xs z-[100] hidden flex items-center justify-center p-4">
+<div id="modalAdmin" onclick="if(event.target === this) closeAdminModal()" class="fixed inset-0 w-full h-full bg-slate-100/85 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
         <!-- Modal Header -->
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -174,7 +174,7 @@ declare(strict_types=1);
                 <button type="button" onclick="closeAdminModal()" class="py-2 px-3.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition cursor-pointer">
                     বাতিল
                 </button>
-                <button type="submit" id="btnSaveAdmin" class="py-2 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center">
+                <button type="submit" id="btnSaveAdmin" class="py-2 px-4 rounded-xl bg-[#00684A] hover:bg-[#00523A] text-white text-xs font-bold transition shadow-brand-glow cursor-pointer flex items-center justify-center">
                     <span>সংরক্ষণ করুন</span>
                 </button>
             </div>

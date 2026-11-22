@@ -722,23 +722,24 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                 </div>
 
                 <!-- Main Glass Card Container -->
-                <div id="dribbbleMockup" class="dribbble-card rounded-3xl p-3 sm:p-5 border border-white">
-                    <div class="rounded-2xl bg-white border border-slate-100 p-4 sm:p-6 shadow-2xs">
+                <div id="dribbbleMockup" class="dribbble-card rounded-3xl p-2.5 sm:p-5 border border-white overflow-hidden">
+                    <div class="rounded-2xl bg-white border border-slate-100 p-3 sm:p-6 shadow-2xs overflow-hidden">
                         
                         <!-- Window Navigation Bar -->
-                        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-                            <div class="flex items-center space-x-2">
-                                <span class="w-3 h-3 rounded-full bg-rose-400 inline-block"></span>
-                                <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
-                                <span class="w-3 h-3 rounded-full bg-[#00ED64] inline-block"></span>
+                        <div class="flex items-center justify-between gap-1.5 sm:gap-2 pb-3.5 sm:pb-4 border-b border-slate-100 mb-4 sm:mb-5">
+                            <div class="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+                                <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-400 inline-block"></span>
+                                <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400 inline-block"></span>
+                                <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00ED64] inline-block"></span>
                             </div>
-                            <div class="flex items-center space-x-2 px-3 py-1 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px] font-mono text-slate-500">
-                                <i data-lucide="lock" class="w-3 h-3 text-[#00684A]"></i>
-                                <span><?= htmlspecialchars($h['live_preview']) ?></span>
+                            <div class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 rounded-lg bg-slate-50 border border-slate-200/80 text-[10px] sm:text-[11px] font-mono text-slate-500 min-w-0 max-w-[150px] sm:max-w-none">
+                                <i data-lucide="lock" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#00684A] shrink-0"></i>
+                                <span class="block truncate sm:hidden">ponnostack.shop</span>
+                                <span class="hidden sm:inline"><?= htmlspecialchars($h['live_preview']) ?></span>
                             </div>
-                            <div class="flex items-center space-x-1.5 text-xs text-slate-400">
-                                <span class="w-2 h-2 rounded-full bg-[#00ED64] animate-pulse"></span>
-                                <span class="text-[10px] font-bold text-slate-500 uppercase">Online</span>
+                            <div class="flex items-center space-x-1 sm:space-x-1.5 text-xs text-slate-400 shrink-0">
+                                <span class="w-2 h-2 rounded-full bg-[#00ED64] animate-pulse shrink-0"></span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase">Online</span>
                             </div>
                         </div>
 
@@ -934,7 +935,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                     </div>
 
                     <!-- CTA Action Button (Primary MongoDB Green) -->
-                    <a href="#contact" 
+                    <a href="checkout?package=starter" 
                        class="w-full py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#00684A] via-[#00684A] to-[#005139] hover:brightness-110 active:scale-95 text-white text-xs font-black transition-all shadow-lg shadow-[#00684A]/30 flex items-center justify-center space-x-2 cursor-pointer">
                         <span><?= htmlspecialchars($p['cta_standard']) ?></span>
                         <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-[#00ED64]"></i>
@@ -1015,7 +1016,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                     </div>
 
                     <!-- CTA Action Button -->
-                    <a href="#contact" 
+                    <a href="checkout?package=professional" 
                        class="w-full py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl border border-slate-200/90 hover:border-[#00684A] text-slate-700 hover:text-[#00684A] hover:bg-emerald-50/40 text-xs font-bold transition-all shadow-2xs flex items-center justify-center space-x-2 active:scale-95 cursor-pointer">
                         <span><?= htmlspecialchars($p['cta_premium']) ?></span>
                         <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -1096,7 +1097,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                     </div>
 
                     <!-- CTA Action Button (Bold Dark Tone) -->
-                    <a href="#contact" 
+                    <a href="checkout?package=enterprise" 
                        class="w-full py-3 sm:py-3.5 px-4 rounded-xl sm:rounded-2xl bg-slate-900 hover:bg-[#00684A] active:scale-95 text-white text-xs font-bold transition-all shadow-sm hover:shadow-md flex items-center justify-center space-x-2 cursor-pointer">
                         <span><?= htmlspecialchars($p['cta_gold']) ?></span>
                         <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -1153,21 +1154,22 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
             </div>
 
             <!-- Demo Browser Container Mockup -->
-            <div id="demoMockup" class="max-w-5xl mx-auto rounded-3xl p-3 sm:p-5 bg-slate-50/70 border border-slate-200 shadow-xl">
+            <div id="demoMockup" class="max-w-5xl mx-auto rounded-3xl p-2.5 sm:p-5 bg-slate-50/70 border border-slate-200 shadow-xl overflow-hidden">
                 <!-- Browser Chrome Bar -->
-                <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200/70">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-3 h-3 rounded-full bg-rose-400"></span>
-                        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
-                        <span class="w-3 h-3 rounded-full bg-[#00ED64]"></span>
+                <div class="flex items-center justify-between gap-1.5 sm:gap-2 pb-3 sm:pb-3.5 mb-3.5 sm:mb-4 border-b border-slate-200/70 overflow-hidden">
+                    <div class="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+                        <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-400"></span>
+                        <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400"></span>
+                        <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00ED64]"></span>
                     </div>
-                    <div class="flex items-center space-x-2 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-mono text-slate-600 shadow-2xs">
-                        <i data-lucide="lock" class="w-3.5 h-3.5 text-[#00684A]"></i>
-                        <span><?= htmlspecialchars($s['demo_preview_url']) ?></span>
+                    <div class="flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white border border-slate-200 text-[10px] sm:text-xs font-mono text-slate-600 shadow-2xs min-w-0 max-w-[170px] sm:max-w-none">
+                        <i data-lucide="lock" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00684A] shrink-0"></i>
+                        <span class="block truncate sm:hidden">ponnostack.shop/demo</span>
+                        <span class="hidden sm:inline"><?= htmlspecialchars($s['demo_preview_url']) ?></span>
                     </div>
-                    <div class="hidden sm:flex items-center space-x-1.5 text-xs text-[#00684A] font-bold">
+                    <div class="flex items-center space-x-1 sm:space-x-1.5 text-xs text-[#00684A] font-bold shrink-0">
                         <span class="w-2 h-2 rounded-full bg-[#00ED64] animate-pulse"></span>
-                        <span class="text-[11px]">Live Preview</span>
+                        <span class="text-[11px] hidden sm:inline">Live Preview</span>
                     </div>
                 </div>
 
@@ -1175,13 +1177,13 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
                     
                     <!-- Col 1: Customer Storefront Experience (7 Cols) -->
-                    <div class="lg:col-span-7 bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-2xs flex flex-col justify-between">
+                    <div class="lg:col-span-7 bg-white rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-2xs flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-[#00684A] bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-0 mb-4">
+                                <span class="w-fit text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#00684A] bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100 whitespace-nowrap">
                                     <?= htmlspecialchars($s['demo_tab_store']) ?>
                                 </span>
-                                <span class="text-xs font-mono text-slate-400">Theme: Modern Clean</span>
+                                <span class="text-[11px] sm:text-xs font-mono text-slate-400 whitespace-nowrap">Theme: Modern Clean</span>
                             </div>
 
                             <!-- Showcase Product Item Mockup -->
@@ -1226,13 +1228,13 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                     </div>
 
                     <!-- Col 2: Merchant Control Overview (5 Cols) -->
-                    <div class="lg:col-span-5 bg-white rounded-2xl p-5 sm:p-6 border border-slate-100 shadow-2xs flex flex-col justify-between space-y-4">
+                    <div class="lg:col-span-5 bg-white rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-2xs flex flex-col justify-between space-y-4">
                         <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-0 mb-4">
+                                <span class="w-fit text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 whitespace-nowrap">
                                     <?= htmlspecialchars($s['demo_tab_admin']) ?>
                                 </span>
-                                <span class="text-xs font-mono text-[#00684A] font-bold">Auto Sync</span>
+                                <span class="text-[11px] sm:text-xs font-mono text-[#00684A] font-bold whitespace-nowrap">Auto Sync</span>
                             </div>
 
                             <div class="space-y-3">
@@ -1526,25 +1528,33 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                     <p class="text-xs text-slate-500 mb-5"><?= htmlspecialchars($s['contact_guarantee']) ?></p>
 
                     <form id="contactForm" onsubmit="handleContactSubmit(event)" class="space-y-4">
-                        <div>
-                            <label for="contactName" class="block text-xs font-bold text-slate-700 mb-1.5"><?= htmlspecialchars($s['contact_name']) ?></label>
-                            <input type="text" id="contactName" required placeholder="উদাঃ সাকিব আহমেদ" 
-                                   class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] focus:bg-white transition">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label for="contactName" class="block text-xs font-bold text-slate-700 mb-1.5"><?= htmlspecialchars($s['contact_name']) ?> <span class="text-rose-500">*</span></label>
+                                <input type="text" id="contactName" name="name" required placeholder="উদাঃ সাকিব আহমেদ" 
+                                       class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] focus:bg-white transition">
+                            </div>
+
+                            <div>
+                                <label for="contactPhone" class="block text-xs font-bold text-slate-700 mb-1.5"><?= htmlspecialchars($s['contact_ph']) ?> <span class="text-rose-500">*</span></label>
+                                <input type="tel" id="contactPhone" name="phone" required placeholder="01XXXXXXXXX" 
+                                       class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 font-mono focus:outline-none focus:border-[#00684A] focus:bg-white transition">
+                            </div>
                         </div>
 
                         <div>
-                            <label for="contactPhone" class="block text-xs font-bold text-slate-700 mb-1.5"><?= htmlspecialchars($s['contact_ph']) ?></label>
-                            <input type="tel" id="contactPhone" required placeholder="01XXXXXXXXX" 
+                            <label for="contactEmail" class="block text-xs font-bold text-slate-700 mb-1.5">ইমেইল ঠিকানা (ঐচ্ছিক)</label>
+                            <input type="email" id="contactEmail" name="email" placeholder="example@email.com" 
                                    class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 font-mono focus:outline-none focus:border-[#00684A] focus:bg-white transition">
                         </div>
 
                         <div>
-                            <label for="contactMsg" class="block text-xs font-bold text-slate-700 mb-1.5"><?= htmlspecialchars($s['contact_msg']) ?></label>
-                            <textarea id="contactMsg" rows="3" required placeholder="আপনার স্টোর বা প্রয়োজনীয় সার্ভিস সম্পর্কে লিখুন..." 
+                            <label for="contactMsg" class="block text-xs font-bold text-slate-700 mb-1.5"><?= htmlspecialchars($s['contact_msg']) ?> <span class="text-rose-500">*</span></label>
+                            <textarea id="contactMsg" name="message" rows="3" required placeholder="আপনার স্টোর বা প্রয়োজনীয় সার্ভিস সম্পর্কে লিখুন..." 
                                       class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] focus:bg-white transition resize-none"></textarea>
                         </div>
 
-                        <div id="contactFormFeedback" class="hidden p-3 rounded-xl text-xs font-bold"></div>
+                        <div id="contactFormFeedback" class="hidden p-3.5 rounded-xl text-xs font-bold"></div>
 
                         <button type="submit" id="contactSubmitBtn" 
                                 class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#00684A] to-[#005139] hover:brightness-110 active:scale-95 text-white text-xs font-black shadow-md shadow-[#00684A]/25 transition flex items-center justify-center space-x-2 cursor-pointer">
@@ -1713,25 +1723,70 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
         }
     });
 
-    // Contact Form Submission Handler
-    function handleContactSubmit(e) {
+    // Contact Form Submission Handler (Dynamic AJAX to Database)
+    async function handleContactSubmit(e) {
         e.preventDefault();
         const feedback = document.getElementById('contactFormFeedback');
         const submitBtn = document.getElementById('contactSubmitBtn');
         const name = document.getElementById('contactName')?.value.trim();
         const phone = document.getElementById('contactPhone')?.value.trim();
+        const email = document.getElementById('contactEmail')?.value.trim();
+        const message = document.getElementById('contactMsg')?.value.trim();
 
-        if (!feedback) return;
+        function showFeedback(msg, type) {
+            if (!feedback) return;
+            const isSuccess = (type === 'success');
+            feedback.className = isSuccess 
+                ? 'p-3.5 rounded-xl text-xs font-bold bg-emerald-50 text-[#00684A] border border-emerald-200 block'
+                : 'p-3.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 block';
+            feedback.innerHTML = `<div class="flex items-center space-x-2"><i data-lucide="${isSuccess ? 'check-circle' : 'alert-circle'}" class="w-4 h-4 shrink-0"></i><span>${msg}</span></div>`;
+            if (window.lucide) lucide.createIcons();
+            if (isSuccess) {
+                setTimeout(() => { feedback.className = 'hidden'; }, 7000);
+            }
+        }
 
-        feedback.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-[#00684A] border border-emerald-200 block';
-        feedback.innerHTML = '<div class="flex items-center space-x-2"><i data-lucide="check-circle" class="w-4 h-4"></i><span>ধন্যবাদ! আপনার বার্তাটি পাঠানো হয়েছে। আমরা শীঘ্রই যোগাযোগ করব।</span></div>';
-        
+        if (!name || name.length < 2) {
+            showFeedback('অনুগ্রহ করে আপনার নাম দিন (কমপক্ষে ২ অক্ষর)', 'error');
+            return;
+        }
+        if (!phone || phone.length < 10) {
+            showFeedback('সঠিক মোবাইল নম্বর প্রদান করুন', 'error');
+            return;
+        }
+        if (!message || message.length < 5) {
+            showFeedback('অনুগ্রহ করে বার্তার বিস্তারিত লিখুন (কমপক্ষে ৫ অক্ষর)', 'error');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        const origBtnHtml = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-1.5"></i><span>বার্তা পাঠানো হচ্ছে...</span>';
         if (window.lucide) lucide.createIcons();
-        e.target.reset();
 
-        setTimeout(() => {
-            feedback.className = 'hidden';
-        }, 6000);
+        try {
+            const res = await fetch('api/contact.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone, email, message })
+            });
+            const data = await res.json();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origBtnHtml;
+            if (window.lucide) lucide.createIcons();
+
+            if (data.success) {
+                showFeedback(data.message || 'ধন্যবাদ! আপনার বার্তাটি সফলভাবে পাঠানো হয়েছে।', 'success');
+                e.target.reset();
+            } else {
+                showFeedback(data.message || 'বার্তা পাঠাতে সমস্যা হয়েছে। পুনরায় চেষ্টা করুন।', 'error');
+            }
+        } catch (err) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = origBtnHtml;
+            if (window.lucide) lucide.createIcons();
+            showFeedback('সার্ভারের সাথে সংযোগ স্থাপন করা যায়নি। ইন্টারনেট পরীক্ষা করুন।', 'error');
+        }
     }
 </script>
 

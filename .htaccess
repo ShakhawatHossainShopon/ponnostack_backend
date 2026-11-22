@@ -19,8 +19,9 @@ AddDefaultCharset UTF-8
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/Ponnostack/index\.php(?:\?([^\s]*))?\s [NC]
     RewriteRule ^index\.php$ /Ponnostack/ [R=301,L]
 
-    # 3. Serve real existing files directly (images, css, js, robots.txt, sitemap.xml)
-    RewriteCond %{REQUEST_FILENAME} -f
+    # 3. Serve real existing files and directories directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
     # 4. Clean extensionless URLs (e.g. /about -> about.php, /api/packages -> api/packages.php)

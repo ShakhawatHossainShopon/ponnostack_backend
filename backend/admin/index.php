@@ -19,17 +19,37 @@ $pageRegistry = [
         'title' => 'ড্যাশবোর্ড ওভারভিউ | Ponnostack',
         'file'  => 'dashboard.php',
     ],
+    'active_tenants' => [
+        'title' => 'অল অ্যাক্টিভ স্টোরফ্রন্ট | Ponnostack',
+        'file'  => 'active_tenants.php',
+    ],
+    'setup_tenants' => [
+        'title' => 'সেটআপ পেন্ডিং স্টোরফ্রন্ট | Ponnostack',
+        'file'  => 'setup_tenants.php',
+    ],
+    'payment_tenants' => [
+        'title' => 'পেমেন্ট পেন্ডিং স্টোরফ্রন্ট | Ponnostack',
+        'file'  => 'payment_tenants.php',
+    ],
+    'billing' => [
+        'title' => 'মাসিক বিল ও ইনভয়েস ম্যানেজমেন্ট | Ponnostack',
+        'file'  => 'billing.php',
+    ],
+    'tenants' => [
+        'title' => 'অল অ্যাক্টিভ স্টোরফ্রন্ট | Ponnostack',
+        'file'  => 'active_tenants.php',
+    ],
     'admins' => [
         'title' => 'অ্যাডমিন ইউজার ম্যানেজমেন্ট | Ponnostack',
         'file'  => 'admins.php',
     ],
-    'tenants' => [
-        'title' => 'স্টোর ও টেন্যান্টস | Ponnostack',
-        'file'  => 'tenants.php',
-    ],
     'packages' => [
         'title' => 'প্যাকেজ ইনফো ও প্রাইসিং | Ponnostack',
         'file'  => 'packages.php',
+    ],
+    'inbox' => [
+        'title' => 'ইনবক্স ও কাস্টমার মেসেজ | Ponnostack',
+        'file'  => 'inbox.php',
     ],
     'settings' => [
         'title' => 'প্ল্যাটফর্ম সেটিংস | Ponnostack',

@@ -27,6 +27,23 @@ $pageTitle = $pageTitle ?? 'অ্যাডমিন ড্যাশবোর্
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', '"Hind Siliguri"', 'sans-serif'],
                         mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#F0FDF4',
+                            100: '#DCFCE7',
+                            200: '#BBF7D0',
+                            300: '#86EFAC',
+                            400: '#4ADE80',
+                            500: '#00ED64',
+                            600: '#00684A',
+                            700: '#00523A',
+                            800: '#003E2C',
+                            900: '#001E17',
+                        }
+                    },
+                    boxShadow: {
+                        'brand-glow': '0 10px 25px -5px rgba(0, 104, 74, 0.25)',
                     }
                 }
             }
@@ -39,7 +56,7 @@ $pageTitle = $pageTitle ?? 'অ্যাডমিন ড্যাশবোর্
         /* Top Page Transition Loader */
         #topProgressBar {
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-            box-shadow: 0 0 10px rgba(79, 70, 229, 0.7);
+            box-shadow: 0 0 10px rgba(0, 104, 74, 0.7);
         }
 
         /* Smooth Page Entry Animation (Opacity only to prevent position:fixed clipping) */
