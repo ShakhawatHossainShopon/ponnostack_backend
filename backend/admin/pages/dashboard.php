@@ -28,7 +28,7 @@ $unreadMessages = $msgModel->getUnreadCount();
         </div>
 
         <div class="shrink-0 flex items-center space-x-2">
-            <a href="index.php?page=tenants" class="inline-flex items-center space-x-2 py-2.5 px-4 rounded-xl bg-[#00684A] hover:bg-[#00523A] text-white text-xs font-bold shadow-brand-glow transition cursor-pointer">
+            <a href="index.php?page=active_tenants" class="inline-flex items-center space-x-2 py-2.5 px-4 rounded-xl bg-[#00684A] hover:bg-[#00523A] text-white text-xs font-bold shadow-brand-glow transition cursor-pointer">
                 <i data-lucide="store" class="w-4 h-4"></i>
                 <span>স্টোর ম্যানেজ করুন</span>
             </a>
@@ -38,11 +38,11 @@ $unreadMessages = $msgModel->getUnreadCount();
     <!-- Quick Stat Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1: Active Stores -->
-        <a href="index.php?page=tenants" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between hover:border-emerald-300 transition">
+        <a href="index.php?page=active_tenants" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between hover:border-emerald-300 transition">
             <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">সক্রিয় স্টোর</span>
-                <span class="text-2xl font-black text-[#00684A] mt-1 block"><?= $stats['active'] ?></span>
-                <span class="text-[10px] text-slate-400 font-mono mt-0.5 block">মোট স্টোর: <?= $stats['total'] ?></span>
+                <span class="text-2xl font-black text-[#00684A] mt-1 block"><?= (int)($stats['active'] ?? 0) ?></span>
+                <span class="text-[10px] text-slate-400 font-mono mt-0.5 block">মোট স্টোর: <?= (int)($stats['total'] ?? 0) ?></span>
             </div>
             <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-[#00684A] flex items-center justify-center">
                 <i data-lucide="store" class="w-5 h-5"></i>
@@ -50,10 +50,10 @@ $unreadMessages = $msgModel->getUnreadCount();
         </a>
 
         <!-- Card 2: Pending Store Approvals -->
-        <a href="index.php?page=tenants" class="bg-white border border-amber-200/90 bg-amber-50/20 rounded-2xl p-5 shadow-xs flex items-center justify-between hover:border-amber-300 transition">
+        <a href="index.php?page=payment_tenants" class="bg-white border border-amber-200/90 bg-amber-50/20 rounded-2xl p-5 shadow-xs flex items-center justify-between hover:border-amber-300 transition">
             <div>
                 <span class="text-[11px] font-bold text-amber-800 uppercase tracking-wider block">অনুমোদন অপেক্ষমাণ</span>
-                <span class="text-2xl font-black text-amber-900 mt-1 block"><?= $stats['pending'] ?></span>
+                <span class="text-2xl font-black text-amber-900 mt-1 block"><?= (int)($stats['payment_pending'] ?? $stats['pending'] ?? 0) ?></span>
                 <span class="text-[10px] text-amber-700 font-semibold mt-0.5 block">পেমেন্ট রিভিউ প্রয়োজন</span>
             </div>
             <div class="w-11 h-11 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center">
@@ -65,7 +65,7 @@ $unreadMessages = $msgModel->getUnreadCount();
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between">
             <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">মাসিক আবর্তক ফি (MRR)</span>
-                <span class="text-2xl font-black text-slate-900 font-mono mt-1 block">৳ <?= number_format($stats['mrr']) ?></span>
+                <span class="text-2xl font-black text-slate-900 font-mono mt-1 block">৳ <?= number_format((float)($stats['mrr'] ?? 0)) ?></span>
                 <span class="text-[10px] text-emerald-600 font-semibold mt-0.5 block">সক্রিয় সাবস্ক্রিপশন হতে</span>
             </div>
             <div class="w-11 h-11 rounded-2xl bg-slate-50 text-slate-600 flex items-center justify-center">
@@ -77,7 +77,7 @@ $unreadMessages = $msgModel->getUnreadCount();
         <a href="index.php?page=inbox" class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex items-center justify-between hover:border-emerald-300 transition">
             <div>
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">ইনবক্স বার্তা</span>
-                <span class="text-2xl font-black text-slate-900 mt-1 block"><?= $unreadMessages ?></span>
+                <span class="text-2xl font-black text-slate-900 mt-1 block"><?= (int)($unreadMessages ?? 0) ?></span>
                 <span class="text-[10px] text-rose-600 font-semibold mt-0.5 block">নতুন অপঠিত বার্তা</span>
             </div>
             <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-[#00684A] flex items-center justify-center">
@@ -87,29 +87,55 @@ $unreadMessages = $msgModel->getUnreadCount();
     </div>
 
     <!-- Quick Navigation Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Module Card 1: Tenants -->
-        <a href="index.php?page=tenants" class="group bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs hover:border-emerald-300 hover:shadow-md transition">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-[#00684A] flex items-center justify-center group-hover:scale-105 transition shadow-2xs">
-                    <i data-lucide="store" class="w-6 h-6"></i>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Module Card 1: Active Tenants -->
+        <a href="index.php?page=active_tenants" class="group bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:border-emerald-300 hover:shadow-md transition">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-[#00684A] flex items-center justify-center group-hover:scale-105 transition shadow-2xs shrink-0">
+                    <i data-lucide="store" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-slate-900 group-hover:text-[#00684A] transition">স্টোর ও টেন্যান্ট ম্যানেজমেন্ট &rarr;</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">মার্চেন্ট স্টোরফ্রন্ট অনুমোদন, লাইভ লিংক বরাদ্দ, মেয়াদ ও বিলিং ট্র্যাকিং।</p>
+                    <h3 class="text-xs font-bold text-slate-900 group-hover:text-[#00684A] transition">সক্রিয় স্টোরফ্রন্ট &rarr;</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">লাইভ স্টোর ও মেয়াদ ট্র্যাকিং</p>
                 </div>
             </div>
         </a>
 
-        <!-- Module Card 2: Admins -->
-        <a href="index.php?page=admins" class="group bg-white border border-slate-200/90 rounded-3xl p-6 shadow-xs hover:border-emerald-300 hover:shadow-md transition">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-[#00684A] flex items-center justify-center group-hover:scale-105 transition shadow-2xs">
-                    <i data-lucide="users" class="w-6 h-6"></i>
+        <!-- Module Card 2: Setup Pending -->
+        <a href="index.php?page=setup_tenants" class="group bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:border-sky-300 hover:shadow-md transition">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center group-hover:scale-105 transition shadow-2xs shrink-0">
+                    <i data-lucide="globe" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-slate-900 group-hover:text-[#00684A] transition">অ্যাডমিন ইউজার ম্যানেজমেন্ট &rarr;</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">সিস্টেম অ্যাডমিন অ্যাকাউন্ট ও অনুমতি পরিচালনা করুন।</p>
+                    <h3 class="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition">সেটআপ পেন্ডিং &rarr;</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">ডোমেইন ও লাইভ লিংক বরাদ্দ</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Module Card 3: Monthly Billing -->
+        <a href="index.php?page=billing" class="group bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:border-indigo-300 hover:shadow-md transition">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center group-hover:scale-105 transition shadow-2xs shrink-0">
+                    <i data-lucide="receipt" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold text-slate-900 group-hover:text-indigo-700 transition">মাসিক বিল ও ইনভয়েস &rarr;</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">নবায়ন অনুমোদন ও কালেকশন</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Module Card 4: Admins -->
+        <a href="index.php?page=admins" class="group bg-white border border-slate-200/90 rounded-3xl p-5 shadow-xs hover:border-emerald-300 hover:shadow-md transition">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-slate-50 text-slate-700 flex items-center justify-center group-hover:scale-105 transition shadow-2xs shrink-0">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold text-slate-900 group-hover:text-[#00684A] transition">অ্যাডমিন ইউজার &rarr;</h3>
+                    <p class="text-[11px] text-slate-500 mt-0.5">সিস্টেম রোল ও এক্সেস</p>
                 </div>
             </div>
         </a>
