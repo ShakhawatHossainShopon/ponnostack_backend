@@ -582,6 +582,20 @@ class Tenant extends Model
     }
 
     /**
+     * Update Tenant Hero Carousel Banners (Max 5)
+     */
+    public function updateBanners(string $uuid, array $banners): bool
+    {
+        $clean = array_values(array_slice($banners, 0, 5));
+        $sql = "UPDATE `tenants` SET `banners` = :banners WHERE `uuid` = :uuid";
+        $stmt = $this->query($sql, [
+            ':uuid'    => $uuid,
+            ':banners' => json_encode($clean, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+        ]);
+        return true;
+    }
+
+    /**
      * Calculate next monthly billing date from a specific day (e.g. 10th of next month)
      */
     public static function calculateNextBillingDate(int $billingDay = 10): string
@@ -615,6 +629,14 @@ class Tenant extends Model
                 : $row['social_links'];
         } else {
             $row['social_links'] = [];
+        }
+
+        if (!empty($row['banners'])) {
+            $row['banners'] = is_string($row['banners'])
+                ? (json_decode($row['banners'], true) ?: [])
+                : $row['banners'];
+        } else {
+            $row['banners'] = [];
         }
 
         // Expiry & Days Left Calculation
@@ -660,6 +682,16 @@ class Tenant extends Model
         $row['logo_url'] = !empty($row['logo'])
             ? (str_starts_with($row['logo'], 'http') ? $row['logo'] : $baseUrl . '/' . ltrim($row['logo'], '/'))
             : null;
+
+        // Generate full hero carousel banner URLs
+        $row['banner_urls'] = [];
+        if (!empty($row['banners']) && is_array($row['banners'])) {
+            foreach ($row['banners'] as $b) {
+                if (!empty($b)) {
+                    $row['banner_urls'][] = str_starts_with($b, 'http') ? $b : $baseUrl . '/' . ltrim($b, '/');
+                }
+            }
+        }
 
         // Subdomain URL preview
         $row['subdomain_url'] = "https://{$row['slug']}.ponnostack.shop";

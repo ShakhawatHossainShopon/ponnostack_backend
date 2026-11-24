@@ -738,4 +738,152 @@ class TenantController extends Controller
 
         $this->success($formatted, 'Store profile updated successfully');
     }
+
+    /**
+     * POST /api/tenants/{uuid}/banners
+     * Upload up to 5 uncompressed high-resolution banners (max 5MB each)
+     */
+    public function uploadBanner(string|int $uuid): void
+    {
+        $identifier = trim((string)$uuid);
+        $tenant = $this->tenantModel->findByUuid($identifier);
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findBySlug($identifier);
+        }
+
+        if (!$tenant) {
+            $this->error('প্রদত্ত UUID অনুযায়ী কোনো স্টোরফ্রন্ট পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        $currentBanners = is_array($tenant['banners'] ?? null) ? $tenant['banners'] : [];
+        if (count($currentBanners) >= 5) {
+            $this->error('সর্বোচ্চ ৫টি ব্যানার আপলোড করা যাবে। নতুন ব্যানার যোগ করতে আগে পুরনো ব্যানার মুছুন।', 422);
+            return;
+        }
+
+        $filesToProcess = [];
+        $rawFiles = $_FILES['banners'] ?? $_FILES['banner'] ?? null;
+
+        if (!$rawFiles || empty($rawFiles['name'])) {
+            $this->error('কোনো ব্যানার ফাইল নির্বাচন করা হয়নি।', 400);
+            return;
+        }
+
+        if (is_array($rawFiles['name'])) {
+            foreach ($rawFiles['name'] as $idx => $name) {
+                if (($rawFiles['error'][$idx] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+                    $filesToProcess[] = [
+                        'name'     => $rawFiles['name'][$idx],
+                        'type'     => $rawFiles['type'][$idx],
+                        'tmp_name' => $rawFiles['tmp_name'][$idx],
+                        'error'    => $rawFiles['error'][$idx],
+                        'size'     => $rawFiles['size'][$idx],
+                    ];
+                }
+            }
+        } else {
+            if ($rawFiles['error'] === UPLOAD_ERR_OK) {
+                $filesToProcess[] = $rawFiles;
+            }
+        }
+
+        if (empty($filesToProcess)) {
+            $this->error('কোনো বৈধ ফাইল পাওয়া যায়নি অথবা ফাইল আপলোডে সমস্যা হয়েছে।', 400);
+            return;
+        }
+
+        $remainingSlots = 5 - count($currentBanners);
+        $filesToProcess = array_slice($filesToProcess, 0, $remainingSlots);
+        $maxBannerBytes = 5 * 1024 * 1024; // Strict 5MB limit
+
+        foreach ($filesToProcess as $fileItem) {
+            if ($fileItem['size'] > $maxBannerBytes) {
+                $this->error("ব্যানারের সাইজ সর্বোচ্চ ৫MB হতে পারবে। '{$fileItem['name']}' ফাইলটি ৫MB এর চেয়ে বড়।", 422);
+                return;
+            }
+
+            $upload = Uploader::upload(
+                $fileItem,
+                'uploads/banners',
+                Uploader::IMAGE_TYPES,
+                $maxBannerBytes,
+                false // Uncompressed raw quality
+            );
+
+            if (!$upload['success']) {
+                $this->error($upload['error'], 422);
+                return;
+            }
+
+            $currentBanners[] = $upload['relative_path'];
+        }
+
+        $this->tenantModel->updateBanners($tenant['uuid'], $currentBanners);
+        $updated = $this->tenantModel->findByUuid($tenant['uuid']);
+        unset($updated['password'], $updated['admin_password'], $updated['admin_note']);
+
+        $this->success($updated, 'ব্যানার সফলভাবে আপলোড হয়েছে।');
+    }
+
+    /**
+     * POST /api/tenants/{uuid}/banners/delete
+     * Delete a specific banner from the store's hero carousel
+     */
+    public function deleteBanner(string|int $uuid): void
+    {
+        $identifier = trim((string)$uuid);
+        $tenant = $this->tenantModel->findByUuid($identifier);
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findBySlug($identifier);
+        }
+
+        if (!$tenant) {
+            $this->error('স্টোরফ্রন্ট খুঁজে পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        $raw = file_get_contents('php://input');
+        $input = json_decode($raw ?: '[]', true) ?? $_POST;
+
+        $bannerPath = trim((string)($input['banner_path'] ?? ''));
+        $bannerIndex = isset($input['index']) ? (int)$input['index'] : -1;
+
+        $currentBanners = is_array($tenant['banners'] ?? null) ? $tenant['banners'] : [];
+        $removed = false;
+
+        if ($bannerPath !== '') {
+            foreach ($currentBanners as $idx => $path) {
+                if ($path === $bannerPath || str_ends_with($bannerPath, $path) || str_ends_with($path, $bannerPath)) {
+                    $removed = true;
+                    unset($currentBanners[$idx]);
+                    $projectRoot = dirname(__DIR__, 3);
+                    $fullPath = $projectRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, ltrim($path, '/'));
+                    if (is_file($fullPath)) {
+                        @unlink($fullPath);
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (!$removed && $bannerIndex >= 0 && isset($currentBanners[$bannerIndex])) {
+            $pathToDelete = $currentBanners[$bannerIndex];
+            unset($currentBanners[$bannerIndex]);
+            $projectRoot = dirname(__DIR__, 3);
+            $fullPath = $projectRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, ltrim($pathToDelete, '/'));
+            if (is_file($fullPath)) {
+                @unlink($fullPath);
+            }
+            $removed = true;
+        }
+
+        $currentBanners = array_values($currentBanners);
+        $this->tenantModel->updateBanners($tenant['uuid'], $currentBanners);
+
+        $updated = $this->tenantModel->findByUuid($tenant['uuid']);
+        unset($updated['password'], $updated['admin_password'], $updated['admin_note']);
+
+        $this->success($updated, 'ব্যানার সফলভাবে মুছে ফেলা হয়েছে।');
+    }
 }

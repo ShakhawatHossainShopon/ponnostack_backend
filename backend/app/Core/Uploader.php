@@ -60,7 +60,8 @@ class Uploader
         array $file,
         string $destinationDir = 'uploads/logos',
         array $allowedTypes = self::IMAGE_TYPES,
-        int $maxSizeBytes = 5242880
+        int $maxSizeBytes = 5242880,
+        bool $compress = true
     ): array {
         if (!isset($file['error']) || is_array($file['error'])) {
             return ['success' => false, 'error' => 'অবৈধ ফাইল আপলোড প্যারামিটার।'];
@@ -107,8 +108,8 @@ class Uploader
             }
         }
 
-        // If SVG or GIF, move directly without re-compression
-        if ($ext === 'svg' || $ext === 'gif') {
+        // If uncompressed upload requested, or SVG / GIF, move directly preserving original quality
+        if (!$compress || $ext === 'svg' || $ext === 'gif') {
             $safeName = bin2hex(random_bytes(8)) . '_' . time() . '.' . $ext;
             $destinationPath = $absoluteTargetDir . DIRECTORY_SEPARATOR . $safeName;
             if (!move_uploaded_file($file['tmp_name'], $destinationPath)) {

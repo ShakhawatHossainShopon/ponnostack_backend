@@ -40,3 +40,9 @@ $router->post('/api/tenants/{uuid}/profile', [TenantController::class, 'updatePr
 $router->get('/api/storefront/{uuid}/profile', [TenantController::class, 'profile']);
 $router->put('/api/storefront/{uuid}/profile', [TenantController::class, 'updateProfile']);
 $router->post('/api/storefront/{uuid}/profile', [TenantController::class, 'updateProfile']);
+
+// Client Storefront Carousel Banners Upload & Delete APIs
+$router->post('/api/tenants/{uuid}/banners', [TenantController::class, 'uploadBanner']);
+$router->post('/api/tenants/{uuid}/banners/delete', [TenantController::class, 'deleteBanner']);
+$router->post('/api/storefront/{uuid}/banners', [TenantController::class, 'uploadBanner']);
+$router->post('/api/storefront/{uuid}/banners/delete', [TenantController::class, 'deleteBanner']);

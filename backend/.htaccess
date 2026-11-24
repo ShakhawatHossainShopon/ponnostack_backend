@@ -1,5 +1,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Seamless fallback: if static asset requested via /backend/uploads/*, serve directly from root uploads/*
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^uploads/(.*)$ ../uploads/$1 [L]
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.php [QSA,L]
