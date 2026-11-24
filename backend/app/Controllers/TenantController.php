@@ -762,6 +762,37 @@ class TenantController extends Controller
             return;
         }
 
+        // 1. Check for Base64 JSON upload (100% immune to shared hosting WAF & ModSecurity multipart file blocks)
+        $raw = preg_replace('/^\xEF\xBB\xBF/', '', (string)file_get_contents('php://input'));
+        $input = json_decode($raw ?: '[]', true) ?? $_POST;
+        $base64List = $input['banners_base64'] ?? $input['banners'] ?? $input['banner_base64'] ?? null;
+
+        if (!empty($base64List)) {
+            if (!is_array($base64List)) {
+                $base64List = [$base64List];
+            }
+            $remainingSlots = 5 - count($currentBanners);
+            $base64List = array_slice($base64List, 0, $remainingSlots);
+
+            foreach ($base64List as $b64Item) {
+                if (empty($b64Item) || !is_string($b64Item)) continue;
+                $upload = Uploader::uploadBase64($b64Item, 'uploads/banners', 5 * 1024 * 1024, false);
+                if (!$upload['success']) {
+                    $this->error($upload['error'], 422);
+                    return;
+                }
+                $currentBanners[] = $upload['relative_path'];
+            }
+
+            $this->tenantModel->updateBanners($tenant['uuid'], $currentBanners);
+            $updated = $this->tenantModel->findByUuid($tenant['uuid']);
+            unset($updated['password'], $updated['admin_password'], $updated['admin_note']);
+
+            $this->success($updated, 'ব্যানার সফলভাবে আপলোড হয়েছে।');
+            return;
+        }
+
+        // 2. Fallback: Standard Multipart $_FILES upload
         $filesToProcess = [];
         $rawFiles = $_FILES['banners'] ?? $_FILES['banner'] ?? null;
 

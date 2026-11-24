@@ -151,6 +151,84 @@ class Uploader
     }
 
     /**
+     * Upload an incoming base64 encoded image string safely
+     * 100% immune to shared hosting ModSecurity & WAF multipart file inspection
+     *
+     * @param string $base64String e.g. "data:image/jpeg;base64,..."
+     * @param string $destinationDir e.g. 'uploads/banners'
+     * @param int $maxSizeBytes default 5MB
+     * @param bool $compress whether to compress to ~200KB WebP
+     * @return array
+     */
+    public static function uploadBase64(
+        string $base64String,
+        string $destinationDir = 'uploads/banners',
+        int $maxSizeBytes = 5242880,
+        bool $compress = false
+    ): array {
+        if (!preg_match('/^data:image\/(\w+);base64,/', $base64String, $matches)) {
+            $data = base64_decode($base64String, true);
+            $ext = 'jpg';
+        } else {
+            $ext = strtolower($matches[1]);
+            $data = base64_decode(substr($base64String, strpos($base64String, ',') + 1), true);
+        }
+
+        if ($data === false || empty($data)) {
+            return ['success' => false, 'error' => 'অবৈধ ইমেজ ডাটা বা বেস৬৪ ফরম্যাট।'];
+        }
+
+        if (strlen($data) > $maxSizeBytes) {
+            $maxMb = round($maxSizeBytes / (1024 * 1024), 1);
+            return ['success' => false, 'error' => "ফাইলের সাইজ {$maxMb}MB এর চেয়ে ছোট হতে হবে।"];
+        }
+
+        // Target Directory
+        $projectRoot = dirname(__DIR__, 3);
+        $cleanDir = trim(str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $destinationDir), DIRECTORY_SEPARATOR);
+        $absoluteTargetDir = $projectRoot . DIRECTORY_SEPARATOR . $cleanDir;
+
+        if (!is_dir($absoluteTargetDir)) {
+            @mkdir($absoluteTargetDir, 0755, true);
+        }
+
+        $tmpFile = tempnam(sys_get_temp_dir(), 'b64_');
+        file_put_contents($tmpFile, $data);
+
+        // Validate MIME type
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $realMime = $finfo->file($tmpFile);
+
+        if (!in_array($realMime, self::IMAGE_TYPES, true)) {
+            @unlink($tmpFile);
+            return ['success' => false, 'error' => 'অবৈধ ফাইল ফরম্যাট। শুধুমাত্র ছবি গ্রহণযোগ্য।'];
+        }
+
+        if ($compress && extension_loaded('gd') && $realMime !== 'image/svg+xml' && $realMime !== 'image/gif') {
+            $safeName = bin2hex(random_bytes(8)) . '_' . time() . '.webp';
+            $destinationPath = $absoluteTargetDir . DIRECTORY_SEPARATOR . $safeName;
+            $compressed = self::compressImage($tmpFile, $destinationPath, 204800, 1200);
+            @unlink($tmpFile);
+            if (!$compressed) {
+                @rename($tmpFile, $destinationPath);
+            }
+        } else {
+            $safeName = bin2hex(random_bytes(8)) . '_' . time() . '.' . ($ext === 'jpeg' ? 'jpg' : $ext);
+            $destinationPath = $absoluteTargetDir . DIRECTORY_SEPARATOR . $safeName;
+            @rename($tmpFile, $destinationPath);
+        }
+
+        $relativePath = str_replace('\\', '/', $cleanDir) . '/' . $safeName;
+        return [
+            'success'       => true,
+            'filename'      => $safeName,
+            'relative_path' => $relativePath,
+            'url'           => '/' . $relativePath,
+            'full_url'      => self::getBaseUrl() . '/' . $relativePath,
+        ];
+    }
+
+    /**
      * Compress and scale image down to target size & max dimension
      */
     public static function compressImage(
