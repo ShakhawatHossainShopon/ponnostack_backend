@@ -25,3 +25,18 @@ $router->post('/api/admin/payments/manual', [TenantController::class, 'recordMan
 $router->get('/api/admin/payments/{id}/invoice', [TenantController::class, 'getInvoice']);
 $router->post('/api/admin/payments/{id}/approve', [TenantController::class, 'approvePaymentRecord']);
 $router->delete('/api/admin/payments/{id}', [TenantController::class, 'deletePaymentRecord']);
+
+// Public Client Storefront Gateway API
+$router->get('/api/storefront/{uuid}', [TenantController::class, 'getStorefront']);
+$router->post('/api/storefront/auth/login', [TenantController::class, 'storefrontLogin']);
+$router->get('/api/tenants/{uuid}', [TenantController::class, 'getStorefront']);
+$router->post('/api/tenants/auth/login', [TenantController::class, 'storefrontLogin']);
+$router->get('/api/storefront/store/{uuid}', [TenantController::class, 'getStorefront']);
+
+// Client Store Profile & Design Update APIs
+$router->get('/api/tenants/{uuid}/profile', [TenantController::class, 'profile']);
+$router->put('/api/tenants/{uuid}/profile', [TenantController::class, 'updateProfile']);
+$router->post('/api/tenants/{uuid}/profile', [TenantController::class, 'updateProfile']);
+$router->get('/api/storefront/{uuid}/profile', [TenantController::class, 'profile']);
+$router->put('/api/storefront/{uuid}/profile', [TenantController::class, 'updateProfile']);
+$router->post('/api/storefront/{uuid}/profile', [TenantController::class, 'updateProfile']);

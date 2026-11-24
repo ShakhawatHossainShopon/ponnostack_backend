@@ -352,6 +352,37 @@ declare(strict_types=1);
             if (!str) return '';
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
+
+        // Global Universal Copy-to-Clipboard Helper
+        function copyText(text, label = 'UUID') {
+            if (!text || text === '-') return;
+            const str = String(text).trim();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(str).then(() => {
+                    Toast.show(`${label} সফলভাবে কপি করা হয়েছে!`, 'success');
+                }).catch(() => {
+                    fallbackCopy(str, label);
+                });
+            } else {
+                fallbackCopy(str, label);
+            }
+        }
+
+        function fallbackCopy(str, label) {
+            const ta = document.createElement('textarea');
+            ta.value = str;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                Toast.show(`${label} সফলভাবে কপি করা হয়েছে!`, 'success');
+            } catch(e) {
+                Toast.show('কপি করতে ব্যর্থ হয়েছে। ম্যানুয়ালি কপি করুন।', 'error');
+            }
+            document.body.removeChild(ta);
+        }
     </script>
 </body>
 </html>

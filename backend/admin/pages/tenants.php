@@ -172,6 +172,12 @@ $activeTenants         = array_values(array_filter($tenants, fn($t) => in_array(
                                             <div class="min-w-0">
                                                 <span class="font-black text-slate-900 block truncate text-xs sm:text-sm"><?= htmlspecialchars($t['name']) ?></span>
                                                 <span class="text-[10px] text-slate-400 font-mono block">slug: <?= htmlspecialchars($t['slug']) ?></span>
+                                                <div class="flex items-center space-x-1.5 mt-0.5">
+                                                    <code class="text-[10px] text-slate-500 font-mono font-bold bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[140px]" title="<?= htmlspecialchars($t['uuid']) ?>"><?= htmlspecialchars($t['uuid']) ?></code>
+                                                    <button type="button" onclick="copyText('<?= htmlspecialchars($t['uuid']) ?>', 'Store UUID')" class="p-1 rounded hover:bg-amber-100 text-slate-400 hover:text-amber-700 transition cursor-pointer" title="UUID কপি করুন">
+                                                        <i data-lucide="copy" class="w-3 h-3"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -296,6 +302,12 @@ $activeTenants         = array_values(array_filter($tenants, fn($t) => in_array(
                                             <div class="min-w-0">
                                                 <span class="font-black text-slate-900 block truncate text-xs sm:text-sm"><?= htmlspecialchars($t['name']) ?></span>
                                                 <span class="text-[10px] text-slate-400 font-mono block">slug: <?= htmlspecialchars($t['slug']) ?></span>
+                                                <div class="flex items-center space-x-1.5 mt-0.5">
+                                                    <code class="text-[10px] text-slate-500 font-mono font-bold bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[140px]" title="<?= htmlspecialchars($t['uuid']) ?>"><?= htmlspecialchars($t['uuid']) ?></code>
+                                                    <button type="button" onclick="copyText('<?= htmlspecialchars($t['uuid']) ?>', 'Store UUID')" class="p-1 rounded hover:bg-amber-100 text-slate-400 hover:text-amber-700 transition cursor-pointer" title="UUID কপি করুন">
+                                                        <i data-lucide="copy" class="w-3 h-3"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -510,6 +522,12 @@ $activeTenants         = array_values(array_filter($tenants, fn($t) => in_array(
                                                 <?php else: ?>
                                                     <span class="text-[10px] text-slate-400 font-mono block">slug: <?= htmlspecialchars($t['slug']) ?></span>
                                                 <?php endif; ?>
+                                                <div class="flex items-center space-x-1.5 mt-0.5">
+                                                    <code class="text-[10px] text-slate-500 font-mono font-bold bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[140px]" title="<?= htmlspecialchars($t['uuid']) ?>"><?= htmlspecialchars($t['uuid']) ?></code>
+                                                    <button type="button" onclick="copyText('<?= htmlspecialchars($t['uuid']) ?>', 'Store UUID')" class="p-1 rounded hover:bg-emerald-100 text-slate-400 hover:text-[#00684A] transition cursor-pointer" title="UUID কপি করুন">
+                                                        <i data-lucide="copy" class="w-3 h-3"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -671,8 +689,18 @@ $activeTenants         = array_values(array_filter($tenants, fn($t) => in_array(
                 <span class="text-slate-500">স্টোর নাম:</span>
                 <strong class="text-slate-900 font-bold" id="setupStoreName">-</strong>
             </div>
+            <div class="flex justify-between items-center bg-white p-2 rounded-xl border border-slate-200">
+                <span class="text-slate-600 font-bold text-[11px]">Store UUID:</span>
+                <div class="flex items-center space-x-1.5">
+                    <code class="font-mono font-black text-[#00684A] text-[11px] selection:bg-emerald-100" id="setupUuid">-</code>
+                    <button type="button" onclick="copyText(document.getElementById('setupUuid').textContent, 'Store UUID')" class="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-[#00684A] hover:text-white text-slate-700 text-[10px] font-bold transition flex items-center space-x-1 cursor-pointer shadow-2xs" title="UUID কপি করুন">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                        <span>কপি</span>
+                    </button>
+                </div>
+            </div>
             <div class="flex justify-between">
-                <span class="text-slate-500">মার্চেন্ট ও ফোন:</span>
+                <span class="text-slate-500">স্টোর ওনার ও ফোন:</span>
                 <span class="font-bold text-slate-800" id="setupOwner">-</span>
             </div>
             <div class="flex justify-between">
@@ -1162,6 +1190,7 @@ $activeTenants         = array_values(array_filter($tenants, fn($t) => in_array(
     function openSetupModal(tenant) {
         document.getElementById('setupTenantId').value = tenant.id;
         document.getElementById('setupStoreName').innerText = tenant.name + ' (' + tenant.slug + ')';
+        document.getElementById('setupUuid').innerText = tenant.uuid || '-';
         document.getElementById('setupOwner').innerText = tenant.owner_name + ' (' + (tenant.owner_phone || '-') + ')';
         document.getElementById('setupPackage').innerText = (tenant.package_name || 'স্ট্যান্ডার্ড প্যাকেজ') + ' - ৳' + tenant.monthly_fee + '/মাস';
         document.getElementById('setupTrxId').innerText = tenant.payment_trx_id || 'অনুমোদিত';

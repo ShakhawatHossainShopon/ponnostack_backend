@@ -116,6 +116,12 @@ $totalPending = count($tenants);
                                                 <?php endif; ?>
                                             </div>
                                             <span class="text-[10px] text-slate-400 font-mono block">slug: <?= htmlspecialchars($t['slug']) ?></span>
+                                            <div class="flex items-center space-x-1.5 mt-0.5">
+                                                <code class="text-[10px] text-slate-500 font-mono font-bold bg-slate-100 px-1.5 py-0.5 rounded truncate max-w-[140px]" title="<?= htmlspecialchars($t['uuid']) ?>"><?= htmlspecialchars($t['uuid']) ?></code>
+                                                <button type="button" onclick="copyText('<?= htmlspecialchars($t['uuid']) ?>', 'Store UUID')" class="p-1 rounded hover:bg-sky-100 text-slate-400 hover:text-sky-700 transition cursor-pointer" title="UUID কপি করুন">
+                                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

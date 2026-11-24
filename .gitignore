@@ -1,6 +1,6 @@
 # Legacy Reference & Old Code Archives (Never push to remote repository)
 _legacy_reference/
-_reference_old_code/
+legacy_code/
 
 # Separate Repositories (Independent Git Repos)
 ponnostack-frontend/

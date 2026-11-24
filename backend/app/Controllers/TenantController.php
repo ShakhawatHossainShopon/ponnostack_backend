@@ -587,4 +587,155 @@ class TenantController extends Controller
 
         $this->success($created, 'অফলাইন বিল সফলভাবে সংরক্ষিত ও ইনভয়েস তৈরি হয়েছে!', 201);
     }
+
+    /**
+     * Public Storefront API Gateway
+     * GET /api/storefront/{uuid}
+     */
+    public function getStorefront(string|int $uuid): void
+    {
+        $identifier = trim((string)$uuid);
+        if (empty($identifier)) {
+            $this->error('Store UUID প্রদান করা আবশ্যক।', 400);
+            return;
+        }
+
+        $store = $this->tenantModel->findByUuid($identifier);
+        if (!$store) {
+            // Also fallback to search by slug if uuid lookup misses
+            $store = $this->tenantModel->findBySlug($identifier);
+        }
+
+        if (!$store) {
+            $this->error('প্রদত্ত UUID অনুযায়ী কোনো স্টোরফ্রন্ট খুঁজে পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        // Clean internal/sensitive fields for public consumption
+        unset($store['password'], $store['admin_password'], $store['admin_note']);
+
+        $this->success($store, 'স্টোরফ্রন্ট তথ্য সফলভাবে লোড হয়েছে।');
+    }
+
+    /**
+     * Store Owner Admin Login endpoint for child storefronts
+     * Authenticates by email and password (or checkout TrxID)
+     */
+    public function storefrontLogin(): void
+    {
+        $raw = file_get_contents('php://input');
+        $input = json_decode($raw ?: '[]', true) ?? $_POST;
+
+        $uuid = trim((string)($input['store_uuid'] ?? ($_SERVER['HTTP_X_STORE_UUID'] ?? '')));
+        $email = strtolower(trim((string)($input['email'] ?? '')));
+        $password = (string)($input['password'] ?? '');
+        $trxId = trim((string)($input['trx_id'] ?? ''));
+
+        if (empty($email)) {
+            $this->error('ইমেইল ঠিকানা প্রদান করুন।', 422);
+            return;
+        }
+
+        if (empty($password) && empty($trxId)) {
+            $this->error('পাসওয়ার্ড বা TrxID প্রদান করুন।', 422);
+            return;
+        }
+
+        // Find tenant by UUID or by Email
+        $tenant = null;
+        if (!empty($uuid)) {
+            $tenant = $this->tenantModel->findByUuid($uuid);
+        }
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findByEmail($email);
+        }
+
+        if (!$tenant || strtolower($tenant['owner_email']) !== $email) {
+            $this->error('ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।', 401);
+            return;
+        }
+
+        // Authenticate password or TrxID
+        $validPassword = !empty($tenant['password']) && password_verify($password, $tenant['password']);
+        $validTrx = (!empty($tenant['payment_trx_id']) && (
+            (!empty($password) && strcasecmp($password, $tenant['payment_trx_id']) === 0) ||
+            (!empty($trxId) && strcasecmp($trxId, $tenant['payment_trx_id']) === 0)
+        ));
+
+        if (!$validPassword && !$validTrx) {
+            $this->error('ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।', 401);
+            return;
+        }
+
+        $token = bin2hex(random_bytes(32));
+
+        // Format clean tenant data for client
+        $storeData = $this->tenantModel->formatRow($tenant);
+        unset($storeData['password'], $storeData['admin_password'], $storeData['admin_note']);
+
+        $this->success([
+            'token' => $token,
+            'tenant' => $storeData,
+        ], 'লগইন সফল হয়েছে!');
+    }
+
+    /**
+     * GET /api/tenants/{uuid}/profile
+     * Fetch store profile for client dashboard
+     */
+    public function profile(string|int $uuid): void
+    {
+        $identifier = trim((string)$uuid);
+        $tenant = $this->tenantModel->findByUuid($identifier);
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findBySlug($identifier);
+        }
+        if (!$tenant) {
+            $this->error('Store profile not found', 404);
+            return;
+        }
+
+        $formatted = $this->tenantModel->formatRow($tenant);
+        unset($formatted['password'], $formatted['admin_password'], $formatted['admin_note']);
+        $this->success($formatted, 'Store profile retrieved');
+    }
+
+    /**
+     * PUT /api/tenants/{uuid}/profile
+     * Update store information from client dashboard (template, palette, etc.)
+     */
+    public function updateProfile(string|int $uuid): void
+    {
+        $identifier = trim((string)$uuid);
+        $tenant = $this->tenantModel->findByUuid($identifier);
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findBySlug($identifier);
+        }
+        if (!$tenant) {
+            $this->error('Store not found', 404);
+            return;
+        }
+
+        $raw = file_get_contents('php://input');
+        $input = json_decode($raw ?: '[]', true) ?? $_POST;
+
+        $allowedToUpdate = ['name', 'slug', 'owner_phone', 'address', 'social_links', 'template_id', 'color_palette'];
+        if (!empty($input['password'])) {
+            $allowedToUpdate[] = 'password';
+        }
+
+        $updateData = [];
+        foreach ($allowedToUpdate as $key) {
+            if (array_key_exists($key, $input)) {
+                $updateData[$key] = $input[$key];
+            }
+        }
+
+        $this->tenantModel->update((int)$tenant['id'], $updateData);
+        $updated = $this->tenantModel->find((int)$tenant['id']);
+        $formatted = $this->tenantModel->formatRow($updated);
+        unset($formatted['password'], $formatted['admin_password'], $formatted['admin_note']);
+
+        $this->success($formatted, 'Store profile updated successfully');
+    }
 }
