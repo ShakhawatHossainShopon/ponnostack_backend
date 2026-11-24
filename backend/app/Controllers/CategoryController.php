@@ -45,16 +45,6 @@ class CategoryController extends Controller
             $_SERVER['HTTP_X_TENANT_UUID'] ?? null,
         ];
 
-        // Also check Authorization header token if present
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-        if (preg_match('/Bearer\s+(\S+)/i', $authHeader, $matches)) {
-            $token = $matches[1];
-            $t = $this->tenantModel->findByToken($token);
-            if ($t) {
-                return ['id' => (int)$t['id'], 'uuid' => $t['uuid']];
-            }
-        }
-
         $uuid = '';
         foreach ($candidates as $cand) {
             if ($cand !== null && trim((string)$cand) !== '') {
