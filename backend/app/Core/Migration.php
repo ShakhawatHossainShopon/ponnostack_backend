@@ -272,6 +272,58 @@ class Migration
         $db->exec($sqlProducts);
         $logs[] = "Table 'products' verified / created successfully.";
 
+        // 11. Create 'orders' table if not exists
+        $sqlOrders = "CREATE TABLE IF NOT EXISTS `orders` (
+            `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            `uuid` VARCHAR(36) NOT NULL UNIQUE,
+            `order_number` VARCHAR(50) NOT NULL UNIQUE,
+            `tenant_id` INT UNSIGNED NOT NULL,
+            `tenant_uuid` VARCHAR(36) NOT NULL,
+            `customer_name` VARCHAR(150) NOT NULL,
+            `customer_phone` VARCHAR(50) NOT NULL,
+            `customer_email` VARCHAR(150) DEFAULT NULL,
+            `division` VARCHAR(100) NOT NULL,
+            `district` VARCHAR(100) NOT NULL,
+            `upazilla` VARCHAR(100) NOT NULL,
+            `delivery_address` TEXT NOT NULL,
+            `delivery_zone` VARCHAR(50) DEFAULT 'inside_dhaka',
+            `delivery_charge` DECIMAL(10,2) NOT NULL DEFAULT 60.00,
+            `subtotal` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+            `total_amount` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+            `payment_method` VARCHAR(50) DEFAULT 'cash_on_delivery',
+            `status` ENUM('pending', 'processing', 'delivered', 'cancel') DEFAULT 'pending',
+            `notes` TEXT DEFAULT NULL,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX `idx_ord_tenant_uuid` (`tenant_uuid`),
+            INDEX `idx_ord_number` (`order_number`),
+            INDEX `idx_ord_status` (`status`),
+            INDEX `idx_ord_created_at` (`created_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        $db->exec($sqlOrders);
+        $logs[] = "Table 'orders' verified / created successfully.";
+
+        // 12. Create 'order_items' table if not exists
+        $sqlOrderItems = "CREATE TABLE IF NOT EXISTS `order_items` (
+            `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            `order_id` INT UNSIGNED NOT NULL,
+            `order_uuid` VARCHAR(36) NOT NULL,
+            `product_id` INT UNSIGNED DEFAULT NULL,
+            `product_uuid` VARCHAR(36) NOT NULL,
+            `product_name` VARCHAR(255) NOT NULL,
+            `product_image` VARCHAR(255) DEFAULT NULL,
+            `size` VARCHAR(50) DEFAULT NULL,
+            `color` VARCHAR(50) DEFAULT NULL,
+            `unit_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+            `quantity` INT NOT NULL DEFAULT 1,
+            `total_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX `idx_item_order_uuid` (`order_uuid`),
+            INDEX `idx_item_prod_uuid` (`product_uuid`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        $db->exec($sqlOrderItems);
+        $logs[] = "Table 'order_items' verified / created successfully.";
+
         return $logs;
     }
 }

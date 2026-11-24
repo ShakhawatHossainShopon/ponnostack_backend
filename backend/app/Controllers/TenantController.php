@@ -614,6 +614,15 @@ class TenantController extends Controller
         // Clean internal/sensitive fields for public consumption
         unset($store['password'], $store['admin_password'], $store['admin_note']);
 
+        // Dynamically resolve package product limit from packages table
+        if (!empty($store['package_slug'])) {
+            $packageModel = new \App\Models\Package();
+            $pkg = $packageModel->findBySlug($store['package_slug']);
+            if ($pkg && isset($pkg['product_limit'])) {
+                $store['product_limit'] = (int)$pkg['product_limit'];
+            }
+        }
+
         $this->success($store, 'স্টোরফ্রন্ট তথ্য সফলভাবে লোড হয়েছে।');
     }
 

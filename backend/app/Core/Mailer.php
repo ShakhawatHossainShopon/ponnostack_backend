@@ -280,4 +280,159 @@ class Mailer
 </html>
 HTML;
     }
+
+    /**
+     * Send order confirmation/notification email
+     *
+     * @param array $order
+     * @param array $tenant
+     * @return bool
+     */
+    public static function sendOrderNotificationEmail(array $order, array $tenant): bool
+    {
+        $storeName = $tenant['name'] ?? 'PonnoStack Store';
+        $orderNum = $order['order_number'] ?? 'ORD-0000';
+        $customerName = $order['customer_name'] ?? 'Customer';
+        $customerPhone = $order['customer_phone'] ?? '';
+        $customerEmail = !empty($order['customer_email']) ? trim($order['customer_email']) : '';
+        $totalAmount = number_format((float)($order['total_amount'] ?? 0), 2);
+        $deliveryCharge = number_format((float)($order['delivery_charge'] ?? 0), 2);
+        $subtotal = number_format((float)($order['subtotal'] ?? 0), 2);
+        $address = "{$order['delivery_address']}, {$order['upazilla']}, {$order['district']}, {$order['division']}";
+
+        // Build item rows HTML
+        $itemsHtml = '';
+        if (!empty($order['items']) && is_array($order['items'])) {
+            foreach ($order['items'] as $item) {
+                $pName = htmlspecialchars($item['product_name'] ?? 'পণ্য');
+                $variantParts = [];
+                if (!empty($item['size'])) $variantParts[] = "সাইজ: " . htmlspecialchars($item['size']);
+                if (!empty($item['color'])) $variantParts[] = "রঙ: " . htmlspecialchars($item['color']);
+                $variantDesc = !empty($variantParts) ? (' (' . implode(', ', $variantParts) . ')') : '';
+                $uPrice = number_format((float)($item['unit_price'] ?? 0), 2);
+                $qty = (int)($item['quantity'] ?? 1);
+                $tPrice = number_format((float)($item['total_price'] ?? ($item['unit_price'] * $qty)), 2);
+
+                $itemsHtml .= "<tr>
+                    <td style='padding: 8px 10px; border-bottom: 1px solid #E2E8F0; font-size: 13px; color: #1E293B;'>{$pName}{$variantDesc}</td>
+                    <td align='center' style='padding: 8px 10px; border-bottom: 1px solid #E2E8F0; font-size: 13px; color: #64748B;'>{$qty}</td>
+                    <td align='right' style='padding: 8px 10px; border-bottom: 1px solid #E2E8F0; font-size: 13px; font-weight: 600; color: #1E293B;'>৳ {$uPrice}</td>
+                    <td align='right' style='padding: 8px 10px; border-bottom: 1px solid #E2E8F0; font-size: 13px; font-weight: 700; color: #00684A;'>৳ {$tPrice}</td>
+                </tr>";
+            }
+        }
+
+        $subject = "অর্ডার নিশ্চিতকরণ — #{$orderNum} ({$storeName})";
+
+        $html = <<<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{$subject}</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #F8FAFC; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" style="max-width: 600px; width: 100%; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E2E8F0;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #00684A; padding: 25px 30px; text-align: center; color: #FFFFFF;">
+                            <h1 style="margin: 0; font-size: 20px; font-weight: 800;">{$storeName}</h1>
+                            <p style="margin: 6px 0 0; font-size: 13px; opacity: 0.9;">আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে!</p>
+                        </td>
+                    </tr>
+
+                    <!-- Body Content -->
+                    <tr>
+                        <td style="padding: 25px 30px;">
+                            <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; text-align: center;">
+                                <span style="font-size: 12px; font-weight: 700; color: #166534; text-transform: uppercase;">ইনভয়েস বা অর্ডার নম্বর</span>
+                                <h2 style="margin: 4px 0 0; font-size: 20px; font-family: monospace; font-weight: 800; color: #00684A;">#{$orderNum}</h2>
+                            </div>
+
+                            <h3 style="font-size: 14px; font-weight: 700; color: #0F172A; margin: 0 0 10px;">ডেলিভারি বিবরণ:</h3>
+                            <table role="presentation" width="100%" style="font-size: 13px; margin-bottom: 20px; background-color: #F8FAFC; border-radius: 10px; padding: 12px;">
+                                <tr>
+                                    <td style="padding: 4px 8px; color: #64748B; width: 30%;">গ্রাহকের নাম:</td>
+                                    <td style="padding: 4px 8px; font-weight: 600; color: #0F172A;">{$customerName}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 8px; color: #64748B;">মোবাইল নম্বর:</td>
+                                    <td style="padding: 4px 8px; font-weight: 600; color: #0F172A;">{$customerPhone}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 8px; color: #64748B;">ডেলিভারি ঠিকানা:</td>
+                                    <td style="padding: 4px 8px; font-weight: 600; color: #0F172A;">{$address}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 4px 8px; color: #64748B;">পেমেন্ট পদ্ধতি:</td>
+                                    <td style="padding: 4px 8px; font-weight: 700; color: #16A34A;">ক্যাশ অন ডেলিভারি (Cash on Delivery)</td>
+                                </tr>
+                            </table>
+
+                            <h3 style="font-size: 14px; font-weight: 700; color: #0F172A; margin: 0 0 10px;">অর্ডারকৃত পণ্যসমূহ:</h3>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-bottom: 20px;">
+                                <thead>
+                                    <tr style="background-color: #F1F5F9;">
+                                        <th align="left" style="padding: 8px 10px; font-size: 12px; color: #475569; font-weight: 700;">পণ্য</th>
+                                        <th align="center" style="padding: 8px 10px; font-size: 12px; color: #475569; font-weight: 700;">পরিমাণ</th>
+                                        <th align="right" style="padding: 8px 10px; font-size: 12px; color: #475569; font-weight: 700;">একক মূল্য</th>
+                                        <th align="right" style="padding: 8px 10px; font-size: 12px; color: #475569; font-weight: 700;">মোট</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {$itemsHtml}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" align="right" style="padding: 8px 10px; font-size: 13px; color: #64748B;">সাবটোটাল:</td>
+                                        <td align="right" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: #0F172A;">৳ {$subtotal}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" align="right" style="padding: 8px 10px; font-size: 13px; color: #64748B;">ডেলিভারি ফি:</td>
+                                        <td align="right" style="padding: 8px 10px; font-size: 13px; font-weight: 600; color: #0F172A;">৳ {$deliveryCharge}</td>
+                                    </tr>
+                                    <tr style="background-color: #F0FDF4;">
+                                        <td colspan="3" align="right" style="padding: 10px; font-size: 14px; font-weight: 800; color: #00684A;">সর্বমোট প্রদেয় বিল:</td>
+                                        <td align="right" style="padding: 10px; font-size: 16px; font-weight: 800; color: #00684A;">৳ {$totalAmount}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            <p style="margin: 0; font-size: 12px; color: #64748B; text-align: center;">
+                                আমাদের শপে অর্ডার করার জন্য ধন্যবাদ। পার্সেল ডেলিভারিম্যান থেকে গ্রহণের সময় ইনভয়েস মিলিয়ে নিন।
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #F1F5F9; padding: 16px; text-align: center; border-top: 1px solid #E2E8F0;">
+                            <p style="margin: 0; font-size: 12px; color: #64748B;">{$storeName} &bull; Powered by Ponnostack Cloud Commerce</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+HTML;
+
+        // 1. Send to Customer if email provided
+        if (!empty($customerEmail)) {
+            self::send($customerEmail, $customerName, $subject, $html);
+        }
+
+        // 2. Also send alert notification to Store Owner
+        $ownerEmail = $tenant['owner_email'] ?? '';
+        if (!empty($ownerEmail) && $ownerEmail !== $customerEmail) {
+            $ownerSubject = "নতুন অর্ডার প্রাপ্তি! — #{$orderNum} (৳ {$totalAmount})";
+            self::send($ownerEmail, $tenant['owner_name'] ?? 'Store Admin', $ownerSubject, $html);
+        }
+
+        return true;
+    }
 }
