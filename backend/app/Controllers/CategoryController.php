@@ -34,15 +34,23 @@ class CategoryController extends Controller
         $raw = preg_replace('/^\xEF\xBB\xBF/', '', (string)file_get_contents('php://input'));
         $input = json_decode($raw ?: '[]', true) ?? $_POST;
 
+        $allHeaders = function_exists('getallheaders') ? array_change_key_case(getallheaders(), CASE_LOWER) : [];
+
         $candidates = [
             $paramUuid,
             $_GET['store'] ?? null,
             $_GET['store_uuid'] ?? null,
             $_GET['tenant_uuid'] ?? null,
+            $input['store'] ?? null,
             $input['store_uuid'] ?? null,
             $input['tenant_uuid'] ?? null,
             $_SERVER['HTTP_X_STORE_UUID'] ?? null,
             $_SERVER['HTTP_X_TENANT_UUID'] ?? null,
+            $_SERVER['REDIRECT_HTTP_X_STORE_UUID'] ?? null,
+            $_SERVER['REDIRECT_HTTP_X_TENANT_UUID'] ?? null,
+            $allHeaders['x-store-uuid'] ?? null,
+            $allHeaders['x-tenant-uuid'] ?? null,
+            $allHeaders['store-uuid'] ?? null,
         ];
 
         $uuid = '';

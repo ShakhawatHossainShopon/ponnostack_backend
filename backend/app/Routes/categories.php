@@ -19,4 +19,6 @@ $router->post('/api/categories/{uuid}/delete', [CategoryController::class, 'dest
 // Scoped Tenant Category Endpoints
 $router->get('/api/tenants/{uuid}/categories', [CategoryController::class, 'index']);
 $router->post('/api/tenants/{uuid}/categories', [CategoryController::class, 'store']);
+$router->post('/api/tenants/{uuid}/categories/upload-image', [CategoryController::class, 'uploadImage']);
 $router->get('/api/storefront/{uuid}/categories', [CategoryController::class, 'index']);
+$router->post('/api/storefront/{uuid}/categories/upload-image', [CategoryController::class, 'uploadImage']);
