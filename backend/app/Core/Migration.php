@@ -202,6 +202,76 @@ class Migration
         $db->exec($sqlMessages);
         $logs[] = "Table 'contact_messages' verified / created successfully.";
 
+        // 8. Create 'delivery_charges' table if not exists
+        $sqlDelivery = "CREATE TABLE IF NOT EXISTS `delivery_charges` (
+            `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            `uuid` VARCHAR(36) NOT NULL UNIQUE,
+            `tenant_id` INT UNSIGNED NOT NULL,
+            `tenant_uuid` VARCHAR(36) NOT NULL,
+            `title` VARCHAR(150) NOT NULL,
+            `code` VARCHAR(50) NOT NULL,
+            `amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `description` VARCHAR(255) DEFAULT NULL,
+            `is_default` TINYINT(1) NOT NULL DEFAULT 0,
+            `status` ENUM('active','inactive') NOT NULL DEFAULT 'active',
+            `sort_order` INT NOT NULL DEFAULT 0,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX `idx_del_tenant_uuid` (`tenant_uuid`),
+            INDEX `idx_del_code` (`code`),
+            INDEX `idx_del_status` (`status`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        $db->exec($sqlDelivery);
+        $logs[] = "Table 'delivery_charges' verified / created successfully.";
+
+        // 9. Create 'categories' table if not exists
+        $sqlCategories = "CREATE TABLE IF NOT EXISTS `categories` (
+            `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            `uuid` VARCHAR(36) NOT NULL UNIQUE,
+            `tenant_id` INT UNSIGNED NOT NULL,
+            `tenant_uuid` VARCHAR(36) NOT NULL,
+            `name` VARCHAR(150) NOT NULL,
+            `slug` VARCHAR(150) NOT NULL,
+            `image` VARCHAR(255) DEFAULT NULL,
+            `is_default` TINYINT(1) NOT NULL DEFAULT 0,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX `idx_cat_tenant_uuid` (`tenant_uuid`),
+            INDEX `idx_cat_tenant_slug` (`tenant_uuid`, `slug`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        $db->exec($sqlCategories);
+        $logs[] = "Table 'categories' verified / created successfully.";
+
+        // 10. Create 'products' table if not exists
+        $sqlProducts = "CREATE TABLE IF NOT EXISTS `products` (
+            `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            `uuid` VARCHAR(36) NOT NULL UNIQUE,
+            `tenant_id` INT UNSIGNED NOT NULL,
+            `tenant_uuid` VARCHAR(36) NOT NULL,
+            `category_uuid` VARCHAR(36) DEFAULT NULL,
+            `name` VARCHAR(255) NOT NULL,
+            `slug` VARCHAR(255) NOT NULL,
+            `description` TEXT DEFAULT NULL,
+            `main_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+            `retailer_price` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+            `discount_percent` INT NOT NULL DEFAULT 0,
+            `discount_starts_at` DATETIME DEFAULT NULL,
+            `discount_ends_at` DATETIME DEFAULT NULL,
+            `stock` INT NOT NULL DEFAULT 0,
+            `sizes` LONGTEXT DEFAULT NULL,
+            `colors` LONGTEXT DEFAULT NULL,
+            `images` LONGTEXT DEFAULT NULL,
+            `status` ENUM('active','inactive') DEFAULT 'active',
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX `idx_prod_tenant_uuid` (`tenant_uuid`),
+            INDEX `idx_prod_category_uuid` (`category_uuid`),
+            INDEX `idx_prod_slug` (`slug`),
+            INDEX `idx_prod_status` (`status`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+        $db->exec($sqlProducts);
+        $logs[] = "Table 'products' verified / created successfully.";
+
         return $logs;
     }
 }

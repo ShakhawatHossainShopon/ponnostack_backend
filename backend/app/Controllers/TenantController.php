@@ -886,4 +886,164 @@ class TenantController extends Controller
 
         $this->success($updated, 'ব্যানার সফলভাবে মুছে ফেলা হয়েছে।');
     }
+
+    /**
+     * GET /api/tenants/{uuid}/payments
+     * GET /api/storefront/{uuid}/payments
+     * Fetch store subscription validity countdown and billing payments history
+     */
+    public function getStorefrontPayments(string $uuid): void
+    {
+        $tenant = $this->tenantModel->findByUuid($uuid);
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findBySlug($uuid);
+        }
+
+        if (!$tenant) {
+            $this->error('স্টোরফ্রন্ট খুঁজে পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        $subscriptionEnds = !empty($tenant['subscription_ends_at']) ? $tenant['subscription_ends_at'] : null;
+        $now = time();
+        $endsTime = $subscriptionEnds ? strtotime($subscriptionEnds) : null;
+        $diffDays = $endsTime ? (int)ceil(($endsTime - $now) / 86400) : null;
+        $isOverdue = ($endsTime !== null && $endsTime < $now) || in_array($tenant['status'], ['expired', 'suspended', 'inactive']);
+        $isExpToday = ($diffDays === 0);
+        $monthlyFee = (float)($tenant['monthly_fee'] ?? 999.00);
+        $billingDay = (int)($tenant['billing_day'] ?? 10);
+        $universalBkash = function_exists('env') ? env('BKASH_NUMBER', '01642956206') : '01642956206';
+
+        $payments = $this->paymentModel->getByTenantUuid($tenant['uuid']);
+
+        $this->success([
+            'tenant' => [
+                'id'                   => (int)$tenant['id'],
+                'uuid'                 => $tenant['uuid'],
+                'name'                 => $tenant['name'],
+                'owner_name'           => $tenant['owner_name'],
+                'owner_phone'          => $tenant['owner_phone'],
+                'owner_email'          => $tenant['owner_email'],
+                'status'               => $tenant['status'],
+                'package_name'         => $tenant['package_name'] ?? 'Pro',
+                'package_slug'         => $tenant['package_slug'] ?? 'pro',
+                'monthly_fee'          => $monthlyFee,
+                'billing_day'          => $billingDay,
+                'subscription_ends_at' => $subscriptionEnds,
+                'days_remaining'       => $diffDays,
+                'is_overdue'           => $isOverdue,
+                'is_exp_today'         => $isExpToday,
+            ],
+            'bkash_number' => $universalBkash,
+            'payments'     => $payments
+        ], 'পেমেন্ট ও সাবস্ক্রিপশন তথ্য সফলভাবে লোড হয়েছে।');
+    }
+
+    /**
+     * POST /api/tenants/{uuid}/payments
+     * POST /api/storefront/{uuid}/payments
+     * Submit a 2-step bKash manual renewal payment
+     */
+    public function submitStorefrontPayment(string $uuid): void
+    {
+        $tenant = $this->tenantModel->findByUuid($uuid);
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findBySlug($uuid);
+        }
+
+        if (!$tenant) {
+            $this->error('স্টোরফ্রন্ট খুঁজে পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        $raw = preg_replace('/^\xEF\xBB\xBF/', '', (string)file_get_contents('php://input'));
+        $input = json_decode($raw ?: '[]', true) ?? $_POST;
+
+        $senderNumber = trim((string)($input['sender_number'] ?? ''));
+        $trxId = strtoupper(trim((string)($input['trx_id'] ?? '')));
+        $amount = !empty($input['amount']) ? (float)$input['amount'] : (float)($tenant['monthly_fee'] ?? 999.00);
+        $billingMonth = trim((string)($input['billing_month'] ?? ''));
+        $note = trim((string)($input['note'] ?? ''));
+
+        if (empty($billingMonth)) {
+            $bnMonths = [
+                'January' => 'জানুয়ারি', 'February' => 'ফেব্রুয়ারি', 'March' => 'মার্চ',
+                'April' => 'এপ্রিল', 'May' => 'মে', 'June' => 'জুন',
+                'July' => 'জুলাই', 'August' => 'আগস্ট', 'September' => 'সেপ্টেম্বর',
+                'October' => 'অক্টোবর', 'November' => 'নভেম্বর', 'December' => 'ডিসেম্বর'
+            ];
+            $billingMonth = ($bnMonths[date('F')] ?? date('F')) . ' ' . date('Y');
+        }
+
+        if (empty($senderNumber) || strlen(preg_replace('/[^0-9]/', '', $senderNumber)) < 11) {
+            $this->error('অনুগ্রহ করে সঠিক ১১ ডিজিটের বিকাশ প্রেরক নম্বর প্রদান করুন।', 422);
+            return;
+        }
+
+        if (!empty($trxId)) {
+            $db = \App\Core\Database::getConnection();
+            $stmt = $db->prepare("SELECT id FROM `tenant_payments` WHERE `trx_id` = :trx_id LIMIT 1");
+            $stmt->execute([':trx_id' => $trxId]);
+            if ($stmt->fetch()) {
+                $this->error('এই ট্রানজেকশন আইডি (TrxID) ইতিমধ্যে একবার ব্যবহার করা হয়েছে। অনুগ্রহ করে যাচাই করুন।', 409);
+                return;
+            }
+        }
+
+        $paymentId = $this->paymentModel->create([
+            'tenant_id'      => (int)$tenant['id'],
+            'tenant_uuid'    => $tenant['uuid'],
+            'store_name'     => $tenant['name'],
+            'sender_number'  => $senderNumber,
+            'trx_id'         => $trxId ?: 'MANUAL_' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8)),
+            'amount'         => $amount,
+            'billing_month'  => $billingMonth,
+            'payment_type'   => 'renewal',
+            'payment_method' => 'bKash',
+            'status'         => 'pending',
+            'admin_note'     => !empty($note) ? "মার্চেন্ট নোট: {$note}" : 'স্টোর অ্যাডমিন প্যানেল হতে মাসিক রিনিউয়াল সাবমিশন',
+        ]);
+
+        $created = $this->paymentModel->find($paymentId);
+
+        $this->success($created, 'আপনার মাসিক বিলের পেমেন্ট তথ্য সফলভাবে জমা দেওয়া হয়েছে! অ্যাডমিন যাচাই করার পর স্বয়ংক্রিয়ভাবে অনুমোদিত হবে।', 201);
+    }
+
+    /**
+     * GET /api/tenants/{uuid}/payments/{id}/invoice
+     * GET /api/storefront/{uuid}/payments/{id}/invoice
+     * Get single invoice details for print/download
+     */
+    public function getStorefrontInvoice(string $uuid, string|int $id): void
+    {
+        $tenant = $this->tenantModel->findByUuid($uuid);
+        if (!$tenant) {
+            $tenant = $this->tenantModel->findBySlug($uuid);
+        }
+
+        if (!$tenant) {
+            $this->error('স্টোরফ্রন্ট খুঁজে পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        $payment = is_numeric($id)
+            ? $this->paymentModel->find((int)$id)
+            : $this->paymentModel->findByInvoiceNo((string)$id);
+
+        if (!$payment || $payment['tenant_uuid'] !== $tenant['uuid']) {
+            $this->error('ইনভয়েস পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        $this->success([
+            'payment' => $payment,
+            'tenant'  => [
+                'name'        => $tenant['name'],
+                'owner_name'  => $tenant['owner_name'],
+                'owner_phone' => $tenant['owner_phone'],
+                'owner_email' => $tenant['owner_email'],
+                'address'     => $tenant['address'] ?? 'ঢাকা, বাংলাদেশ',
+            ]
+        ], 'ইনভয়েস লোড হয়েছে।');
+    }
 }

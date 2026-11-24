@@ -46,3 +46,11 @@ $router->post('/api/tenants/{uuid}/banners', [TenantController::class, 'uploadBa
 $router->post('/api/tenants/{uuid}/banners/delete', [TenantController::class, 'deleteBanner']);
 $router->post('/api/storefront/{uuid}/banners', [TenantController::class, 'uploadBanner']);
 $router->post('/api/storefront/{uuid}/banners/delete', [TenantController::class, 'deleteBanner']);
+
+// Client Storefront Subscription & Billing Payments APIs
+$router->get('/api/tenants/{uuid}/payments', [TenantController::class, 'getStorefrontPayments']);
+$router->post('/api/tenants/{uuid}/payments', [TenantController::class, 'submitStorefrontPayment']);
+$router->get('/api/storefront/{uuid}/payments', [TenantController::class, 'getStorefrontPayments']);
+$router->post('/api/storefront/{uuid}/payments', [TenantController::class, 'submitStorefrontPayment']);
+$router->get('/api/tenants/{uuid}/payments/{id}/invoice', [TenantController::class, 'getStorefrontInvoice']);
+$router->get('/api/storefront/{uuid}/payments/{id}/invoice', [TenantController::class, 'getStorefrontInvoice']);

@@ -122,7 +122,7 @@ if (empty($subscriptionEndsAt)) {
 
 $paymentModel = new \App\Models\TenantPayment();
 $tenantPayments = $paymentModel->getByTenantId((int)$tenant['id']);
-$universalBkash = '01886161110';
+$universalBkash = function_exists('env') ? env('BKASH_NUMBER', '01642956206') : '01642956206';
 ?>
 <!DOCTYPE html>
 <html lang="bn" class="scroll-smooth">
