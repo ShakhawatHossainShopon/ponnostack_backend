@@ -736,13 +736,26 @@ class TenantController extends Controller
         $updateData = [];
         foreach ($allowedToUpdate as $key) {
             if (array_key_exists($key, $input)) {
-                $updateData[$key] = $input[$key];
+                $val = $input[$key];
+                if ($key === 'social_links') {
+                    if (is_string($val)) {
+                        $val = json_decode($val, true) ?: [];
+                    }
+                    if (is_array($val)) {
+                        $cleanSocials = [];
+                        foreach (['facebook', 'instagram', 'whatsapp', 'youtube'] as $network) {
+                            $cleanSocials[$network] = isset($val[$network]) ? trim((string)$val[$network]) : '';
+                        }
+                        $val = $cleanSocials;
+                    }
+                }
+                $updateData[$key] = $val;
             }
         }
 
         $this->tenantModel->update((int)$tenant['id'], $updateData);
         $updated = $this->tenantModel->find((int)$tenant['id']);
-        $formatted = $this->tenantModel->formatRow($updated);
+        $formatted = $updated ?: [];
         unset($formatted['password'], $formatted['admin_password'], $formatted['admin_note']);
 
         $this->success($formatted, 'Store profile updated successfully');

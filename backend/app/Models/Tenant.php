@@ -303,8 +303,14 @@ class Tenant extends Model
 
         foreach ($allowed as $key) {
             if (array_key_exists($key, $data)) {
+                $val = $data[$key];
+                if (in_array($key, ['social_links', 'banners'], true)) {
+                    if (is_array($val)) {
+                        $val = json_encode($val, JSON_UNESCAPED_UNICODE);
+                    }
+                }
                 $fields[] = "`{$key}` = :{$key}";
-                $params[":{$key}"] = $data[$key];
+                $params[":{$key}"] = $val;
             }
         }
 
@@ -627,6 +633,9 @@ class Tenant extends Model
             $row['social_links'] = is_string($row['social_links'])
                 ? (json_decode($row['social_links'], true) ?: [])
                 : $row['social_links'];
+            if (!is_array($row['social_links'])) {
+                $row['social_links'] = [];
+            }
         } else {
             $row['social_links'] = [];
         }
@@ -635,6 +644,9 @@ class Tenant extends Model
             $row['banners'] = is_string($row['banners'])
                 ? (json_decode($row['banners'], true) ?: [])
                 : $row['banners'];
+            if (!is_array($row['banners'])) {
+                $row['banners'] = [];
+            }
         } else {
             $row['banners'] = [];
         }
