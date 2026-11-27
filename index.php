@@ -271,7 +271,7 @@ $sectionsI18n = [
         'demo_subtitle'    => 'কীভাবে আপনার অনলাইন স্টোর চলবে এবং কাস্টমাররা সহজে অর্ডার করবে—সরাসরি ইন্টারফেসে দেখুন।',
         'demo_tab_store'   => 'কাস্টমার স্টোরফ্রন্ট প্রিভিউ',
         'demo_tab_admin'   => 'মার্চেন্ট ড্যাশবোর্ড ওভারভিউ',
-        'demo_preview_url' => 'storefront.ponnostack.com/preview',
+        'demo_preview_url' => 'demo.ponnostack.shop',
         'demo_card_title'  => 'প্রিমিয়াম ব্ল্যাক স্নিকার্স',
         'demo_card_price'  => '৳২,৪৫০',
         'demo_card_cat'    => 'লাইফস্টাইল ফুটওয়্যার',
@@ -341,7 +341,7 @@ $sectionsI18n = [
         'demo_subtitle'    => 'See how effortless storefront browsing and direct customer checkouts function on Ponnostack.',
         'demo_tab_store'   => 'Customer Storefront Preview',
         'demo_tab_admin'   => 'Merchant Dashboard Overview',
-        'demo_preview_url' => 'storefront.ponnostack.com/preview',
+        'demo_preview_url' => 'demo.ponnostack.shop',
         'demo_card_title'  => 'Minimalist Black Sneakers',
         'demo_card_price'  => '৳2,450',
         'demo_card_cat'    => 'Lifestyle Footwear',
@@ -681,7 +681,7 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                 <!-- THE TWO BUTTONS: View Demo & Pricing -->
                 <div class="hero-anim mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
                     <!-- Primary Button: View Demo -->
-                    <a href="#demo" 
+                    <a href="https://demo.ponnostack.shop" target="_blank" rel="noopener noreferrer"
                        class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#00684A] to-[#005139] hover:brightness-110 active:scale-95 text-white text-xs font-black shadow-lg shadow-[#00684A]/25 flex items-center justify-center space-x-2 cursor-pointer transition-all duration-200">
                         <i data-lucide="play-circle" class="w-4 h-4 text-[#00ED64]"></i>
                         <span><?= htmlspecialchars($h['btn_demo']) ?></span>
@@ -1162,15 +1162,19 @@ $s = $sectionsI18n[$lang] ?? $sectionsI18n['bn'];
                         <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-400"></span>
                         <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00ED64]"></span>
                     </div>
-                    <div class="flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white border border-slate-200 text-[10px] sm:text-xs font-mono text-slate-600 shadow-2xs min-w-0 max-w-[170px] sm:max-w-none">
+                    <a href="https://demo.ponnostack.shop" target="_blank" rel="noopener noreferrer" 
+                       class="flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-white hover:bg-emerald-50/60 border border-slate-200 hover:border-emerald-300 text-[10px] sm:text-xs font-mono text-slate-600 hover:text-[#00684A] shadow-2xs min-w-0 max-w-[170px] sm:max-w-none transition group cursor-pointer" title="ভিজিট করুন demo.ponnostack.shop">
                         <i data-lucide="lock" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00684A] shrink-0"></i>
-                        <span class="block truncate sm:hidden">ponnostack.shop/demo</span>
+                        <span class="block truncate sm:hidden">demo.ponnostack.shop</span>
                         <span class="hidden sm:inline"><?= htmlspecialchars($s['demo_preview_url']) ?></span>
-                    </div>
-                    <div class="flex items-center space-x-1 sm:space-x-1.5 text-xs text-[#00684A] font-bold shrink-0">
+                        <i data-lucide="external-link" class="w-3 h-3 text-slate-400 group-hover:text-[#00684A] shrink-0 hidden sm:inline"></i>
+                    </a>
+                    <a href="https://demo.ponnostack.shop" target="_blank" rel="noopener noreferrer"
+                       class="flex items-center space-x-1 sm:space-x-1.5 text-xs text-[#00684A] hover:underline font-bold shrink-0 cursor-pointer">
                         <span class="w-2 h-2 rounded-full bg-[#00ED64] animate-pulse"></span>
                         <span class="text-[11px] hidden sm:inline">Live Preview</span>
-                    </div>
+                        <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 hidden sm:inline"></i>
+                    </a>
                 </div>
 
                 <!-- 2-Column Split: Customer Storefront Experience + Merchant Management Overview -->
