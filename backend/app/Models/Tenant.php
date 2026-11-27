@@ -135,7 +135,8 @@ class Tenant extends Model
      */
     public function findBySlug(string $slug, ?int $excludeId = null): ?array
     {
-        $params = [':slug' => strtolower(trim($slug))];
+        $clean = strtolower(trim($slug));
+        $params = [':slug' => $clean];
         $sql = "SELECT * FROM `tenants` WHERE `slug` = :slug";
         if ($excludeId !== null) {
             $sql .= " AND `id` != :excludeId";
@@ -144,6 +145,21 @@ class Tenant extends Model
         $sql .= " LIMIT 1";
 
         $row = $this->fetch($sql, $params);
+        if (!$row) {
+            // Flexible hyphen/underscore-insensitive fallback:
+            // e.g. "zaharanurcollection" matches "zahara-nur-collection" and vice versa
+            $noHyphens = str_replace(['-', '_'], '', $clean);
+            if (!empty($noHyphens)) {
+                $fallbackSql = "SELECT * FROM `tenants` WHERE REPLACE(REPLACE(`slug`, '-', ''), '_', '') = :noHyphens";
+                $fallbackParams = [':noHyphens' => $noHyphens];
+                if ($excludeId !== null) {
+                    $fallbackSql .= " AND `id` != :excludeId";
+                    $fallbackParams[':excludeId'] = $excludeId;
+                }
+                $fallbackSql .= " LIMIT 1";
+                $row = $this->fetch($fallbackSql, $fallbackParams);
+            }
+        }
         return $row ? self::formatRow($row) : null;
     }
 
