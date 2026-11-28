@@ -313,7 +313,7 @@ class Tenant extends Model
 
         $allowed = [
             'name', 'slug', 'domain', 'admin_url', 'owner_name', 'owner_email',
-            'owner_phone', 'address', 'logo', 'banners', 'social_links', 'template_id', 'color_palette',
+            'owner_phone', 'address', 'currency', 'logo', 'banners', 'social_links', 'template_id', 'color_palette',
             'monthly_fee', 'package_name', 'package_slug', 'product_limit', 'billing_day', 'subscription_ends_at', 'status'
         ];
 

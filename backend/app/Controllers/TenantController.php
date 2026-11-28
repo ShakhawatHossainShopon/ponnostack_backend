@@ -199,6 +199,92 @@ class TenantController extends Controller
      * Approve Store: Assign domain, admin URL, billing day, and activate
      */
     /**
+     * POST /api/admin/tenants/{id}/update
+     * Comprehensive Master Admin Store Editor
+     */
+    public function update(string|int $id): void
+    {
+        if (!$this->checkAuth()) {
+            return;
+        }
+
+        $tenant = is_numeric($id) ? $this->tenantModel->find((int)$id) : $this->tenantModel->findByUuid((string)$id);
+        if (!$tenant) {
+            $this->error('স্টোরটি খুঁজে পাওয়া যায়নি।', 404);
+            return;
+        }
+
+        $raw = file_get_contents('php://input');
+        $input = json_decode($raw ?: '[]', true) ?? $_POST;
+
+        $updateData = [];
+
+        // Store Details
+        if (isset($input['name'])) $updateData['name'] = trim((string)$input['name']);
+        if (isset($input['slug'])) $updateData['slug'] = strtolower(trim((string)$input['slug']));
+        if (isset($input['domain'])) $updateData['domain'] = !empty($input['domain']) ? trim((string)$input['domain']) : null;
+        if (isset($input['admin_url'])) $updateData['admin_url'] = !empty($input['admin_url']) ? trim((string)$input['admin_url']) : null;
+
+        // Owner Details
+        if (isset($input['owner_name'])) $updateData['owner_name'] = trim((string)$input['owner_name']);
+        if (isset($input['owner_email'])) $updateData['owner_email'] = strtolower(trim((string)$input['owner_email']));
+        if (isset($input['owner_phone'])) $updateData['owner_phone'] = trim((string)$input['owner_phone']);
+        if (!empty($input['password'])) {
+            $updateData['password'] = (string)$input['password'];
+        }
+
+        // Package & Billing
+        if (isset($input['package_slug'])) {
+            $updateData['package_slug'] = trim((string)$input['package_slug']);
+            try {
+                $pkg = (new \App\Models\Package())->findBySlug($updateData['package_slug']);
+                if ($pkg) {
+                    $updateData['package_name'] = $pkg['name_bn'] ?? $pkg['name_en'] ?? $pkg['slug'];
+                }
+            } catch (\Throwable $e) {}
+        }
+        if (isset($input['monthly_fee'])) $updateData['monthly_fee'] = max(0, (float)$input['monthly_fee']);
+        if (isset($input['billing_day'])) $updateData['billing_day'] = max(1, min(28, (int)$input['billing_day']));
+        if (isset($input['product_limit'])) $updateData['product_limit'] = max(0, (int)$input['product_limit']);
+        if (isset($input['status'])) $updateData['status'] = trim((string)$input['status']);
+        if (!empty($input['subscription_ends_at'])) {
+            $updateData['subscription_ends_at'] = date('Y-m-d 23:59:59', strtotime((string)$input['subscription_ends_at']));
+        }
+
+        // Store Address & Currency
+        if (isset($input['address'])) $updateData['address'] = trim((string)$input['address']);
+        if (isset($input['currency'])) $updateData['currency'] = strtoupper(trim((string)$input['currency']));
+
+        // Social Media Links (JSON)
+        if (isset($input['social_links'])) {
+            $socials = $input['social_links'];
+            if (is_string($socials)) {
+                $socials = json_decode($socials, true) ?: [];
+            }
+            if (is_array($socials)) {
+                $cleanSocials = [];
+                foreach (['facebook', 'instagram', 'whatsapp', 'youtube', 'tiktok'] as $net) {
+                    $cleanSocials[$net] = isset($socials[$net]) ? trim((string)$socials[$net]) : '';
+                }
+                $updateData['social_links'] = $cleanSocials;
+            }
+        }
+
+        if (empty($updateData)) {
+            $this->error('কোনো ফিল্ড আপডেট করার জন্য প্রদান করা হয়নি।', 422);
+            return;
+        }
+
+        $ok = $this->tenantModel->update((int)$tenant['id'], $updateData);
+        if ($ok) {
+            $updated = $this->tenantModel->find((int)$tenant['id']);
+            $this->success($updated, 'স্টোরের তথ্য সফলভাবে আপডেট করা হয়েছে!');
+        } else {
+            $this->error('স্টোর তথ্য আপডেট করতে সমস্যা হয়েছে।', 500);
+        }
+    }
+
+    /**
      * POST /api/admin/tenants/{id}/approve-payment
      * Stage 1: Approve initial bKash payment, transitions store to setup_pending
      */
@@ -743,7 +829,7 @@ class TenantController extends Controller
                     }
                     if (is_array($val)) {
                         $cleanSocials = [];
-                        foreach (['facebook', 'instagram', 'whatsapp', 'youtube'] as $network) {
+                        foreach (['facebook', 'instagram', 'whatsapp', 'youtube', 'tiktok'] as $network) {
                             $cleanSocials[$network] = isset($val[$network]) ? trim((string)$val[$network]) : '';
                         }
                         $val = $cleanSocials;

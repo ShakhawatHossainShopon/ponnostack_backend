@@ -295,6 +295,14 @@ $packages = $packageModel->getAll();
                                 <!-- 6. Actions -->
                                 <td class="py-3.5 px-4 text-right">
                                     <div class="flex items-center justify-end space-x-1.5">
+                                        <!-- Edit Store Details Button -->
+                                        <button type="button" onclick="openEditStoreModal(<?= htmlspecialchars(json_encode($t, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>)"
+                                            class="py-1 px-2.5 rounded-xl border border-sky-300 bg-sky-50 hover:bg-sky-100 text-sky-900 text-xs font-bold transition cursor-pointer flex items-center space-x-1"
+                                            title="স্টোরের সম্পূর্ণ তথ্য এডিট / আপডেট করুন">
+                                            <i data-lucide="edit-3" class="w-3.5 h-3.5 text-sky-700"></i>
+                                            <span>এডিট</span>
+                                        </button>
+
                                         <!-- Grace Period Extension Button -->
                                         <button type="button" onclick="openGraceModal(<?= htmlspecialchars(json_encode($t)) ?>)"
                                             class="py-1 px-2.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition cursor-pointer flex items-center space-x-1"
@@ -691,6 +699,205 @@ $packages = $packageModel->getAll();
     </div>
 </div>
 
+<!-- =================================================================== -->
+<!-- MODAL: EDIT STORE DETAILS (Pure Light Frosted Glass)                 -->
+<!-- =================================================================== -->
+<div id="editStoreModal" onclick="if(event.target === this) closeEditStoreModal()" class="fixed inset-0 w-full h-full bg-white/85 backdrop-blur-md z-[100] hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white border border-slate-200/90 rounded-3xl w-full max-w-2xl p-5 sm:p-7 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+        <button type="button" onclick="closeEditStoreModal()" class="absolute top-4 right-4 w-7 h-7 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+
+        <div class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
+                <i data-lucide="edit-3" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-black text-slate-900">মার্চেন্ট স্টোরের সম্পূর্ণ তথ্য এডিট করুন</h3>
+                <p class="text-xs text-slate-500" id="editStoreSubTitle">স্টোর আইডি, প্যাকেজ, ডোমেন ও সোশ্যাল মিডিয়া লিংক সমন্বয়</p>
+            </div>
+        </div>
+
+        <form id="editStoreForm" onsubmit="submitEditStore(event)" class="space-y-4">
+            <input type="hidden" id="edTenantId" name="id">
+
+            <!-- Section 1: Store Basic Details -->
+            <div class="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200/80 space-y-3">
+                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i data-lucide="store" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>স্টোরের সাধারণ তথ্য</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">স্টোরের নাম <span class="text-rose-500">*</span></label>
+                        <input type="text" id="edName" name="name" required placeholder="স্টোরের নাম"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">স্টোর স্লাগ / সাবডোমেন <span class="text-rose-500">*</span></label>
+                        <input type="text" id="edSlug" name="slug" required placeholder="store-slug"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">কাস্টম ডোমেইন / লাইভ URL</label>
+                        <input type="url" id="edDomain" name="domain" placeholder="https://yourdomain.com"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">ক্লায়েন্ট অ্যাডমিন URL</label>
+                        <input type="url" id="edAdminUrl" name="admin_url" placeholder="https://yourdomain.com/admin"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Owner & Auth Details -->
+            <div class="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200/80 space-y-3">
+                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>মালিকের তথ্য ও লগইন পাসওয়ার্ড</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">মালিকের নাম <span class="text-rose-500">*</span></label>
+                        <input type="text" id="edOwnerName" name="owner_name" required placeholder="মালিকের নাম"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">ফোন নম্বর <span class="text-rose-500">*</span></label>
+                        <input type="tel" id="edOwnerPhone" name="owner_phone" required placeholder="017xxxxxxxx"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">ইমেইল ঠিকানা <span class="text-rose-500">*</span></label>
+                        <input type="email" id="edOwnerEmail" name="owner_email" required placeholder="owner@gmail.com"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">নতুন পাসওয়ার্ড রিসেট (ঐচ্ছিক)</label>
+                    <input type="text" id="edPassword" name="password" placeholder="পরিবর্তন না করতে চাইলে ফাঁকা রাখুন"
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                </div>
+            </div>
+
+            <!-- Section 3: Package, Billing & Status -->
+            <div class="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200/80 space-y-3">
+                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i data-lucide="tag" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>প্যাকেজ, সাবস্ক্রিপশন ও স্ট্যাটাস</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">প্যাকেজ</label>
+                        <select id="edPackageSlug" name="package_slug"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                            <?php foreach ($packages as $pkg): ?>
+                                <?php $pkgName = $pkg['name_bn'] ?? $pkg['name_en'] ?? $pkg['slug']; ?>
+                                <option value="<?= htmlspecialchars($pkg['slug']) ?>"><?= htmlspecialchars($pkgName) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">মাসিক বিল (BDT)</label>
+                        <input type="number" id="edMonthlyFee" name="monthly_fee" min="0" placeholder="200"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">বিলিং তারিখ (Day 1-28)</label>
+                        <input type="number" id="edBillingDay" name="billing_day" min="1" max="28" placeholder="10"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">প্রোডাক্ট লিমিট (০ = Unlimited)</label>
+                        <input type="number" id="edProductLimit" name="product_limit" min="0" placeholder="50"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">স্টোরের স্ট্যাটাস</label>
+                        <select id="edStatus" name="status"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                            <option value="active">সক্রিয় (Active)</option>
+                            <option value="suspended">স্থগিত (Suspended)</option>
+                            <option value="expired">মেয়াদোত্তীর্ণ (Expired)</option>
+                            <option value="setup_pending">সেটআপ পেন্ডিং (Setup Pending)</option>
+                            <option value="payment_pending">পেমেন্ট পেন্ডিং (Payment Pending)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">মেয়াদ উত্তীর্ণের তারিখ</label>
+                        <input type="date" id="edSubscriptionEndsAt" name="subscription_ends_at"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Social Media Links (Including TikTok) -->
+            <div class="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200/80 space-y-3">
+                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i data-lucide="share-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>সোশ্যাল মিডিয়া প্রোফাইল লিংকসমূহ</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Facebook URL</label>
+                        <input type="url" id="edFacebook" placeholder="https://facebook.com/..."
+                            class="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">Instagram URL</label>
+                        <input type="url" id="edInstagram" placeholder="https://instagram.com/..."
+                            class="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">WhatsApp Number/Link</label>
+                        <input type="text" id="edWhatsapp" placeholder="017xxxxxxxx বা https://wa.me/..."
+                            class="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">YouTube Channel URL</label>
+                        <input type="url" id="edYoutube" placeholder="https://youtube.com/@..."
+                            class="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">TikTok Profile URL</label>
+                        <input type="url" id="edTiktok" placeholder="https://tiktok.com/@..."
+                            class="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Address & Currency -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div class="sm:col-span-3">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ঠিকানা / লোকেশন</label>
+                    <input type="text" id="edAddress" name="address" placeholder="যেমন: ঢাকা, বাংলাদেশ"
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">মুদ্রা (Currency)</label>
+                    <input type="text" id="edCurrency" name="currency" value="BDT" placeholder="BDT"
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00684A] transition bg-white uppercase">
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-end space-x-2">
+                <button type="button" onclick="closeEditStoreModal()" class="py-2 px-4 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition cursor-pointer">
+                    বাতিল
+                </button>
+                <button type="submit" id="btnEditStoreSubmit" class="py-2 px-5 rounded-xl bg-[#00684A] hover:bg-[#00523A] text-white text-xs font-bold shadow-brand-glow transition cursor-pointer flex items-center space-x-1.5">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>আপডেট সংরক্ষণ করুন</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     let currentActiveSubFilter = 'all';
 
@@ -998,6 +1205,124 @@ $packages = $packageModel->getAll();
             }
         } catch (err) {
             Toast.error(err.message || 'স্টোর তৈরি ব্যর্থ হয়েছে।');
+        } finally {
+            setButtonLoading(btn, false);
+        }
+    }
+
+    // ==========================================
+    // 6.5. EDIT STORE DETAILS
+    // ==========================================
+    function openEditStoreModal(tenant) {
+        if (typeof tenant === 'string') {
+            try { tenant = JSON.parse(tenant); } catch(e) {}
+        }
+        if (!tenant) return;
+
+        document.getElementById('edTenantId').value = tenant.id || '';
+        document.getElementById('edName').value = tenant.name || '';
+        document.getElementById('edSlug').value = tenant.slug || '';
+        document.getElementById('edDomain').value = tenant.domain || '';
+        document.getElementById('edAdminUrl').value = tenant.admin_url || '';
+
+        document.getElementById('edOwnerName').value = tenant.owner_name || '';
+        document.getElementById('edOwnerPhone').value = tenant.owner_phone || '';
+        document.getElementById('edOwnerEmail').value = tenant.owner_email || '';
+        document.getElementById('edPassword').value = '';
+
+        if (document.getElementById('edPackageSlug')) {
+            document.getElementById('edPackageSlug').value = tenant.package_slug || 'starter';
+        }
+        document.getElementById('edMonthlyFee').value = tenant.monthly_fee !== undefined ? tenant.monthly_fee : 200;
+        document.getElementById('edBillingDay').value = tenant.billing_day !== undefined ? tenant.billing_day : 10;
+        document.getElementById('edProductLimit').value = tenant.product_limit !== undefined ? tenant.product_limit : 50;
+        document.getElementById('edStatus').value = tenant.status || 'active';
+
+        // Subscription Ends At (Date only: YYYY-MM-DD)
+        if (tenant.subscription_ends_at) {
+            const exp = tenant.subscription_ends_at.split(' ')[0];
+            document.getElementById('edSubscriptionEndsAt').value = exp;
+        } else {
+            document.getElementById('edSubscriptionEndsAt').value = '';
+        }
+
+        document.getElementById('edAddress').value = tenant.address || '';
+        document.getElementById('edCurrency').value = tenant.currency || 'BDT';
+
+        // Parse social links
+        let socials = tenant.social_links || {};
+        if (typeof socials === 'string') {
+            try { socials = JSON.parse(socials); } catch(e) { socials = {}; }
+        }
+        document.getElementById('edFacebook').value = socials.facebook || '';
+        document.getElementById('edInstagram').value = socials.instagram || '';
+        document.getElementById('edWhatsapp').value = socials.whatsapp || '';
+        document.getElementById('edYoutube').value = socials.youtube || '';
+        document.getElementById('edTiktok').value = socials.tiktok || '';
+
+        document.getElementById('editStoreSubTitle').innerText = `${tenant.name} (${tenant.slug}) - ID: #${tenant.id}`;
+
+        document.getElementById('editStoreModal').classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function closeEditStoreModal() {
+        document.getElementById('editStoreModal').classList.add('hidden');
+    }
+
+    async function submitEditStore(e) {
+        e.preventDefault();
+        const tenantId = document.getElementById('edTenantId').value;
+        const btn = document.getElementById('btnEditStoreSubmit');
+
+        const payload = {
+            name: document.getElementById('edName').value.trim(),
+            slug: document.getElementById('edSlug').value.trim(),
+            domain: document.getElementById('edDomain').value.trim(),
+            admin_url: document.getElementById('edAdminUrl').value.trim(),
+            owner_name: document.getElementById('edOwnerName').value.trim(),
+            owner_phone: document.getElementById('edOwnerPhone').value.trim(),
+            owner_email: document.getElementById('edOwnerEmail').value.trim(),
+            package_slug: document.getElementById('edPackageSlug').value,
+            monthly_fee: parseFloat(document.getElementById('edMonthlyFee').value) || 0,
+            billing_day: parseInt(document.getElementById('edBillingDay').value) || 10,
+            product_limit: parseInt(document.getElementById('edProductLimit').value) || 0,
+            status: document.getElementById('edStatus').value,
+            subscription_ends_at: document.getElementById('edSubscriptionEndsAt').value,
+            address: document.getElementById('edAddress').value.trim(),
+            currency: document.getElementById('edCurrency').value.trim(),
+            social_links: {
+                facebook: document.getElementById('edFacebook').value.trim(),
+                instagram: document.getElementById('edInstagram').value.trim(),
+                whatsapp: document.getElementById('edWhatsapp').value.trim(),
+                youtube: document.getElementById('edYoutube').value.trim(),
+                tiktok: document.getElementById('edTiktok').value.trim()
+            }
+        };
+
+        const pwd = document.getElementById('edPassword').value.trim();
+        if (pwd) {
+            payload.password = pwd;
+        }
+
+        setButtonLoading(btn, true, 'আপডেট হচ্ছে...');
+        try {
+            const res = await apiFetch(`../api/admin/tenants/${tenantId}/update`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.success) {
+                Toast.success(res.message || 'স্টোরের তথ্য সফলভাবে আপডেট করা হয়েছে!');
+                closeEditStoreModal();
+                setTimeout(() => window.location.reload(), 700);
+            } else {
+                Toast.error(res.message || 'আপডেট করতে ব্যর্থ হয়েছে।');
+            }
+        } catch(err) {
+            console.error('Error updating store:', err);
+            Toast.error(err.message || 'নেটওয়ার্ক এরর ঘটেছে।');
         } finally {
             setButtonLoading(btn, false);
         }
