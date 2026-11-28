@@ -260,7 +260,7 @@ class ProductController extends Controller
             'stock'              => $stock,
             'sizes'              => $sizes,
             'colors'             => $colors,
-            'images'             => array_slice($images, 0, 5),
+            'images'             => array_slice($images, 0, 10),
             'status'             => ($input['status'] ?? 'active') === 'inactive' ? 'inactive' : 'active',
         ];
 
@@ -367,7 +367,7 @@ class ProductController extends Controller
                     }
                 }
             }
-            $updateData['images'] = array_slice($images, 0, 5);
+            $updateData['images'] = array_slice($images, 0, 10);
         }
 
         if (isset($input['stock'])) {
